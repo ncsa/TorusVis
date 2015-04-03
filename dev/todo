@@ -1,0 +1,16 @@
+
+ - CREATE ADD NODE GROUP/ADD EDGE GROUP METHODS
+
+
+ - Implement node/edge selection, to make it easier to create new groups.
+
+ - Implement group masking, so that you can mask out nodes/edges in a group.
+
+ - Implement mouse picking.
+
+ - add axes with labels
+
+ - add color map legends
+
+ - rename isEdge to isIncidentEdge
+

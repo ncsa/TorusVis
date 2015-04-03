@@ -1,0 +1,35 @@
+
+TorusVis: A Topology Data Visualization Tool
+
+Omar Padron (opadron@illinois.edu)
+David Semararo (semeraro@illinois.edu)
+
+National Center for Supercomputing Applications/University of Illinois
+
+The ever-growing scope of extreme-scale supercomputers requires an increasing
+volume of component-local metrics to better understand their systemic behaviour.
+The collection and analysis of these metrics have become data-intensive tasks in
+their own right, the products of which inform system support activities critical
+to ongoing operations.  With recent emphasis being placed on topology-awareness
+as a step towards better coping with extreme scale, the ability to visualize
+complex topology data has become increasingly valuable, particularly for the
+visualization of multidimensional tori.  Several independent efforts to produce
+similar visualizations exist, but they have typically been in-house developments
+tailor-made for very specific purposes; and not trivially applicable to
+visualization needs not featured among those purposes.  In contrast, a more
+general-purpose tool offers benefits that ease understanding of many
+interrelated aspects of a system's behaviour, such as application performance,
+job node placement, and network traffic patterns.  Perhaps more significantly,
+such a tool can offer analysts insight into the complex topological
+relationships shared among these considerations; relationships that are often
+difficult to quantify by any other means.
+
+We present TorusVis, a general-purpose visualization tool applicable to a wide
+variety of topology-related data presentation scenarios.  Its general-purpose
+software architecture lends itself well to rapid prototyping of various data
+presentation concepts as well as publishing fully featured visualizations.  We
+descibe several key design elements and implenentation strategies, and how they
+strike a balance between usability, generality, and performance.  Furthermore,
+we present use case studies where the capabilities available in TorusVis aided
+understanding of system behaviour in ways not possible, otherwise.
+

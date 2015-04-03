@@ -1,0 +1,7 @@
+node_modules
+dev/docConfig
+dev/build
+tags
+*.swp
+*.o
+.DS_Store

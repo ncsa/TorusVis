@@ -1,0 +1,11 @@
+Format: 1.52
+
+# You can add a title and sub-title to your menu like this:
+# Title: [project name]
+# SubTitle: [subtitle]
+Title: torusvis
+
+# You can add a footer to your documentation like this:
+# Footer: [text]
+Footer:<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Copyright 2013-2015, University of Illinois/NCSA. All rights reserved.<br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This document</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+

@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8"></meta>
+
+        <title>TorusVis: A Topology Data Visualization Tool</title>
+
+        <meta
+            name="description"
+            content="Slides from the paper presentation at the 2014 Cray Users Group Annual Meeting">
+        </meta><meta
+            name="author"
+            content="Omar Padron"
+        ></meta><meta
+            name="apple-mobile-web-app-capable"
+            content="yes"
+        ></meta><meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        ></meta><meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        ></meta>
+
+        <link rel="stylesheet" href="css/reveal.min.css"></link>
+        <link rel="stylesheet" href="css/theme/default.css" id="theme"></link>
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+
+        <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+        <script>
+            (function() {
+                var _do_pdf = window.location.search.match(/print-pdf/gi);
+                document.write(
+                    '<link rel="stylesheet" href="css/print/' +
+                    ( _do_pdf ?  'pdf' : 'paper' )            +
+                    '.css" type="text/css" media="print">'
+                );
+            })();
+        </script>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.min.js"></script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section
+                    data-markdown
+                    data-background="bwfront.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    <br></br>
+                    ## TorusVis:
+                    ##### A Topology Data Visualization Tool
+                    <p>
+                        <small>
+                            <a href="mailto:opadron@illinois.edu">
+                                Omar Padron
+                            </a>,<a href="mailto:semararo@illinois.edu">
+                                Dave Semararo
+                            </a><br>
+                            National Center for Supercomputing Applications
+                            <br>
+                            University of Illinois at Urbana Champaign
+                            <br>
+                            Urbana, IL USA
+                            <br>
+                            <a href="mailto:opadron@illinois.edu,semararo@illinois.edu">
+                                {opadron, semararo}@illinois.edu
+                            </a>
+                        </small>
+                    </p>
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    ### Outline<br><br>
+                    - Intro
+                    - Motivation
+                    - Design
+                    - Case Studies and Demos
+                    - Wrap Up
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - System monitoring is vital for effective HPC
+                      - application optimization
+                      - problem detection
+                      - technical communication
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - Push towards exascale
+                      - systems are getting bigger and bigger
+                      - making monitoring more difficult
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - two distinct challenges with larger systems
+                      1. new volume of data  
+                        "Need Blue Waters to monitor Blue Waters..."
+                      1. new type of data
+                        - topology-awareness becoming more important
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - need a better way to visualize topology data
+                      - see job placement
+                      - visually identify network bottlenecks
+                      - take a birds-eye view of a system's status
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - created many individual prototype applications
+                      - each looking at something different, yet overlapped in a lot of functionality
+                      - not easily adaptable for other purposes
+                      - needed a general-purpose code base to provide common functionality
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - TorusVis
+                      - general-purpose graph visualization library
+                        - geared towards compute interconnect topologies
+                          typical in HPC systems
+                      - written in javascript
+                        - 100% frontend code
+                        - BYOB (bring your own backend)
+                      - designed to be
+                        - generic
+                        - extendable
+                        - simple
+                </script></section>
+
+                <section
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                >
+                    <br>
+                    <h3>proof of concept</h3>
+                    <img src="215389-all-to-all.png"></img>
+                    <small>
+                        early prototype demonstrating node and link
+                        visualization capabilities
+                    </small>
+                </section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    ### Examples
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - application run time consistency
+                      - study performed with Cray and Adaptive
+                      - many applications had variable run time
+                        - same application
+                        - same input
+                        - different run time
+                      - tried to quantify effects due to job node placement
+                </script></section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - It was really difficult!
+                      - none of our proposed metrics correlated strongly in
+                      all cases
+                    - started considering other factors
+                      - interference from other jobs
+                      - external system events
+                    - turned to visualization to help make sense of what was
+                    going on
+                </script></section>
+
+                <section
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                >
+                    <br>
+                    <img src="celso-hpl-bw.png" height="500px"></img>
+                    <br>
+                    <small>
+                        multiple GPU-HPL runs performed over a period of
+                        about three months
+                    </small>
+                </section>
+
+                <section
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                >
+                    <br>
+                    <img src="celso-567784.png"></img>
+                    <br>
+                    <small>
+                        job node placement for the slowest running GPU-HPL
+                        run (<a href="http://isce.ncsa.illinois.edu/seas/testing/main.py?torusvis.tvMainRelease&mode=jobvis&jobid=567784&autoRotate=true">link</a>)
+                    </small>
+                </section>
+
+                <section
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                >
+                    <br>
+                    <img src="celso-595916.png"></img>
+                    <br>
+                    <small>
+                        job node placement for the fastest running GPU-HPL
+                        run (<a href="http://isce.ncsa.illinois.edu/seas/testing/main.py?torusvis.tvMainRelease&mode=jobvis&jobid=595916&autoRotate=true">link</a>)
+                    </small>
+                </section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - communicating system status to a broad audience
+                      - show users how their jobs are placed among others
+                      - show administrators fragmentation and how much network contention to expect
+                      - show stakeholders and the public what is running
+                </script></section>
+
+                <section
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                >
+                    <br>
+                    <img src="capture.png"></img>
+                    <br>
+                    <small>
+                        system utilization view showing the 10 largest jobs
+                        (<a href="https://bluewaters.ncsa.illinois.edu/torus-viewer">link</a>)
+                    </small>
+                </section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - Roadmap and Future Work
+                      - bring TorusVis to feature parity with our prototypes
+                      - explore other interconnect technologies
+                        - Gig-E
+                        - infiniband
+                        - Dragonfly
+                      - support different topologies
+                        - fat trees
+                        - higher dimensional tori
+                        - hierarichal topologies
+                      - experiment with new features to aid understanding
+                </script></section>
+
+                <section
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                >
+                    <br>
+                    <img src="torus.png"></img>
+                    <br>
+                    <small>
+                        torus bending experiment
+                        (<a href="http://tucanca.ncsa.uiuc.edu/~opadron/torusTest.html">link</a>)
+                    </small>
+                </section>
+
+                <section
+                    data-markdown
+                    data-background="bwmid.png"
+                    data-background-size="1000px"
+                ><script type="text/template">
+                    - new applications!
+                      - if you have an idea that uses topology data
+                        visualization, we want to hear from you!
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    [opadron@illinois.edu](mailto:opadron@illinois.edu)
+
+                    [semararo@illinois.edu](mailto:semararo@illinois.edu)
+
+                    [https://github.com/opadron/torusvis](https://github.com/opadron/torusvis)
+
+                </script></section>
+
+
+            </div>
+        </div>
+
+        <a href="https://github.com/opadron/torusvis">
+            <img
+                style="position: absolute; top: 0; right: 0; border: 0;"
+                src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67"
+                alt="Fork me on GitHub"
+                data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png">
+        </a>
+
+        <script>
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                theme: "simple",
+
+                // default/cube/page/concave/zoom/linear/fade/none
+                transition: Reveal.getQueryHash().transition || 'default',
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    {
+                        src: 'lib/js/classList.js',
+                        condition: function() {
+                            return !document.body.classList;
+                        }
+                    }, {
+                        src: 'plugin/markdown/marked.js',
+                        condition: function() {
+                            return !!document.querySelector('[data-markdown]');
+                        }
+                    }, {
+                        src: 'plugin/markdown/markdown.js',
+                        condition: function() {
+                            return !!document.querySelector('[data-markdown]');
+                        }
+                    }, {
+                        src: 'plugin/highlight/highlight.js',
+                        async: true,
+                        callback: function() {
+                            hljs.initHighlightingOnLoad();
+                        }
+                    }, {
+                        src: 'plugin/zoom-js/zoom.js',
+                        async: true,
+                        condition: function() {
+                            return !!document.body.classList;
+                        }
+                    }, {
+                        src: 'plugin/notes/notes.js',
+                        async: true,
+                        condition: function() {
+                            return !!document.body.classList;
+                        }
+                    }
+                ]
+            });
+        </script>
+    </body>
+</html>

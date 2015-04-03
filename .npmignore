@@ -1,0 +1,6 @@
+node_modules
+*.swp
+*.o
+Gruntfile.js
+pub
+dev

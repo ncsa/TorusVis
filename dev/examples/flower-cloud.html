@@ -1,0 +1,470 @@
+<!DOCTYPE HTML>
+<html>
+  <link rel="stylesheet" type="text/css" href="/css/full-screen-body.css">
+  <head>
+    <meta charset="utf-8"></meta>
+    <title>torusvis - flower cloud example</title>
+  </head>
+
+  <body>
+    <script src="/js/jquery/bluebird/three/torusvis"></script>
+    <script>var torusvis = require("torusvis");</script>
+    <script>var THREE = require("three");</script>
+    <script
+        src="/js/node_modules/three/examples/js/controls/OrbitControls.js"
+    ></script>
+
+    <!-- <script src="/js/torusvis.js"></script> -->
+    <script src="./js/loadImage.js"></script>
+    <script src="./js/octree.js"></script>
+
+    <script>
+        var three = require("three");
+        var jquery = require("jquery");
+        var Promise = require("bluebird");
+    </script>
+
+    <script>
+        var isPlainObject = torusvis.misc.utils.isPlainObject;
+
+        /*
+         * compute the centroid of a tree of points in 3D space
+         * 
+         * [tree] is a list of points, or a list of [tree]'s
+         */
+        function treeCentroids(tree) {
+            var centroid = [0.0, 0.0, 0.0];
+
+            /*
+             * recursion case:
+             * 
+             * if [tree] is an inner node, its centroid is the average of all
+             * the centroids of its immediate children
+             * 
+             * also return the subtrees headed by each child.
+             * at the top level, the returned subtrees constitute the entire
+             * tree
+             */
+            if(isPlainObject(tree)) {
+                var children = { };
+                var count = 0;
+                Object.keys(tree).forEach(function(key) {
+                    var t = tree[key];
+                    children[key] = treeCentroids(t);
+                    centroid[0] += children[key].centroid[0];
+                    centroid[1] += children[key].centroid[1];
+                    centroid[2] += children[key].centroid[2];
+                    ++count;
+                });
+
+                centroid[0] /= count;
+                centroid[1] /= count;
+                centroid[2] /= count;
+
+                return { centroid: centroid, children: children };
+            }
+
+            /*
+             * base case:
+             * 
+             * if [tree] is a leaf node, it corresponds to a list of actual
+             * points, so the centroid is simply the average of their positions
+             */
+            Object.keys(tree).forEach(function(key) {
+                var t = tree[key];
+                centroid[0] += t[0];
+                centroid[1] += t[1];
+                centroid[2] += t[2];
+            });
+
+            centroid[0] /= tree.length;
+            centroid[1] /= tree.length;
+            centroid[2] /= tree.length;
+
+            return { centroid: centroid };
+        }
+
+        /*
+         * walk a tree of points/centroids, populating a graph along the way
+         */
+        function graphTreeCentroids(tree, treeCentroids, graph, depth) {
+            depth = depth || 0;
+
+            var node = graph.newNode({
+                position: treeCentroids.centroid,
+                depth: depth
+            });
+
+            var nodeData = graph.nodeData(node);
+
+            var children = treeCentroids.children;
+            var baseCase = !children;
+            if(baseCase) { children = tree; }
+
+            var childNodes = {};
+            var maxChildHeight = 0;
+            Object.keys(children).forEach(function(key) {
+                var subTree = tree[key];
+                var subTreeCentroids = children[key];
+
+                var childNode;
+                /* base case: create the child node directly */
+                if(baseCase) {
+                    childNode = graph.newNode({
+                        position: tree[key],
+                        depth: depth + 1,
+                        height: 1
+                    });
+
+                /* else: create the child node recursively */
+                } else {
+                    childNode = graphTreeCentroids(
+                        subTree,
+                        subTreeCentroids,
+                        graph,
+                        depth + 1
+                    );
+                }
+
+                var childNodeData = graph.nodeData(childNode);
+                var childHeight = childNodeData.height;
+
+                if(maxChildHeight < childHeight) {
+                    maxChildHeight = childHeight;
+                }
+
+                childNodes[key] = childNode;
+            });
+
+            nodeData.height = maxChildHeight + 1;
+
+            /* for each child node... */
+            var childNodeKeys = Object.keys(childNodes);
+            for(var i=0; i<childNodeKeys.length; ++i) {
+                var key = childNodeKeys[i];
+                var childNode = childNodes[key];
+
+                /* ...create an edge from parent to child... */
+                var edge = graph.newEdge(node, childNode);
+                var edgeData = graph.edgeData(edge);
+
+                edgeData.depth = depth;
+                edgeData.height = maxChildHeight + 1;
+                edgeData.type = "parent-to-child";
+
+                /* ...then, create edges among all the child's siblings */
+                for(var j=i+1; j<childNodeKeys.length; ++j) {
+                    var jKey = childNodeKeys[j];
+                    var jChildNode = childNodes[jKey];
+
+                    var jEdge = graph.newEdge(childNode, jChildNode);
+                    var jEdgeData = graph.edgeData(jEdge);
+
+                    jEdgeData.depth = depth;
+                    jEdgeData.height = maxChildHeight + 1;
+                    jEdgeData.type = "sibling-to-sibling";
+                }
+            }
+
+            return node;
+        }
+    </script>
+
+    <script>
+
+        /* change value for different display modes */
+        var DISPLAY_MODE = torusvis.misc.utils.urlArguments().keyword.mode;
+        var modeIsValid = (
+            DISPLAY_MODE === "sprite" ||
+            DISPLAY_MODE === "sphere"
+        );
+
+        if(!modeIsValid) { DISPLAY_MODE = "sprite"; }
+
+
+        /* promise that resolves when the page is fully loaded */
+        var whenDomIsReady = new Promise(function(rs, rj) { jquery(rs); });
+
+
+        /*
+         * promise that resolves when a texture image is fetched...
+         * ... or a dummy promise if DISPLAY_MODE !== "sprite"
+         */
+        var whenTextureIsLoaded;
+        if(DISPLAY_MODE === "sprite") {
+            whenTextureIsLoaded = loadImage("/img/disc.png");
+        } else {
+            whenTextureIsLoaded = Promise.resolve();
+        }
+
+
+        /*
+         * promise that resolves when all the torusvis data structures are
+         * created, except for the node group (creating the node group requires
+         * the texture)
+         */
+        var whenTorusvisStructuresAreReady = Promise.resolve().then(function() {
+
+            var r0 = 1.0, r1 = 0.5;
+            var N = 5000;
+            var nClusters = 1;
+            var K = 5;
+            var i;
+
+            var graph = new torusvis.graphs.DirectedGraph();
+            var points = new Array(N);
+            var anchors = new Array(nClusters);
+
+            /*
+             * generate a cloud of points with nonuniform density (i.e.: try to
+             * bundle the points in clusters)
+             */
+            var x, y, z;
+            for(i=0; i<nClusters; ++i) {
+                x = 2.0*Math.random() - 1.0;
+                y = 2.0*Math.random() - 1.0;
+                z = 2.0*Math.random() - 1.0;
+
+                var mag = Math.sqrt(x*x + y*y + z*z);
+                x *= r0/mag;
+                y *= r0/mag;
+                z *= r0/mag;
+
+                anchors[i] = [x, y, z];
+            }
+
+            for(i=0; i<N; ++i) {
+                x = r1*(Math.random() < 0.5 ? 1 : -1)*0.5*(Math.random() + 1.0);
+                y = r1*(Math.random() < 0.5 ? 1 : -1)*0.5*(Math.random() + 1.0);
+                z = r1*(Math.random() < 0.5 ? 1 : -1)*0.5*(Math.random() + 1.0);
+
+                x += anchors[i%nClusters][0];
+                y += anchors[i%nClusters][1];
+                z += anchors[i%nClusters][2];
+
+                points[i] = [x, y, z];
+            }
+
+            /* construct an octree from the point cloud */
+            var tree = octree(points, K);
+            
+            /* compute the centroids of the octree's nodes */
+            var centroids = treeCentroids(tree);
+            
+            /* populate the [UndirectedGraph] with the points and centroids */
+            var treeRoot = graphTreeCentroids(tree, centroids, graph);
+            var treeRootData = graph.nodeData(treeRoot);
+            var treeHeight = treeRootData.height;
+
+            /*
+             * create edge groups for each level in the tree
+             * 
+             * set the display options according to each group's level
+             * (higher level groups are thinner and less opaque)
+             */
+            var edgeGroups = {};
+            var lerp = torusvis.misc.gmath.lerp;
+            var thP1 = treeHeight + 1;
+
+            graph.iterEdges(function(edge) {
+                var data = graph.edgeData(edge);
+
+                var groupName = ("height_" + data.height);
+                var groupData = edgeGroups[groupName];
+                if(!groupData) {
+                    var color = 0xFF0000;
+
+                    var factor = lerp(data.height, 0, thP1, -12, -5);
+                    opacity = lerp(data.height, 0, thP1, 1.0, 0.25);
+                    size = Math.exp(factor);
+                    mode = "cylinder";
+
+                    groupData = {
+                        edges: [],
+                        displayMode: mode,
+                        displayOptions: {
+                            opacity: opacity,
+                            size: size,
+                            color: color
+                        }
+                    };
+
+                    edgeGroups[groupName] = groupData;
+                }
+
+                groupData.edges.push(edge);
+            });
+
+            Object.keys(edgeGroups).forEach(function(groupName) {
+                edgeGroups[groupName] = (
+                    new torusvis.groups.EdgeGroup(edgeGroups[groupName])
+                );
+            });
+
+            var mapper = new torusvis.mappers.DirectTopologyMapper();
+
+            var engine = new torusvis.engines.ThreeJSOutputEngine(
+                graph, mapper
+            );
+
+            engine.setEdgeGroup(edgeGroups);
+
+            return {
+                treeCentroid: treeRootData.position,
+                treeHeight: treeHeight,
+                engine: engine,
+                graph: graph,
+                mapper: mapper
+            };
+        });
+
+
+        /*
+         * promise that resolves when the node groups are created
+         *
+         * this promise depends on the other torusvis data structures being
+         * ready and possibly the texture being loaded
+         */
+        var whenNodeGroupIsReady = Promise.all([
+            whenTextureIsLoaded,
+            whenTorusvisStructuresAreReady
+        ]).then(function(args) {
+            var displayOptions = {};
+
+            var texture = args[0];
+            if(DISPLAY_MODE === "sprite") {
+                displayOptions.map = texture;
+            } else if(DISPLAY_MODE === "sphere") {
+                displayOptions.thetaSegments = 7;
+                displayOptions.phiSegments = 5;
+            }
+
+            var structures = args[1];
+            var treeHeight = structures.treeHeight;
+            var engine = structures.engine;
+            var graph = structures.graph;
+
+            var nodeGroups = {};
+            var lerp = torusvis.misc.gmath.lerp;
+            var thP1 = treeHeight + 1;
+
+            graph.iterNodes(function(node) {
+                var data = graph.nodeData(node);
+
+                var groupName = ("height_" + data.height);
+                var groupData = nodeGroups[groupName];
+                if(!groupData) {
+                    var opacity = 0.99;
+                    var color = 0xFFFFFF;
+                    var mode = "sprite";
+
+                    var sizeFactor = lerp(data.height, 1, thP1, -7, -4);
+                    size = Math.exp(sizeFactor);
+
+                    if(data.height > 1) {
+                        color = 0x0000FF;
+                    }
+                    if(opacity >= 1.0) { opacity = 0.99; }
+
+                    groupData = {
+                        nodes: [],
+                        displayMode: DISPLAY_MODE,
+                        displayOptions: torusvis.misc.utils.extend(
+                            {}, displayOptions, {
+                                opacity: opacity,
+                                size: size,
+                                color: color
+                            }
+                        )
+                    };
+
+                    if(DISPLAY_MODE === "sprite") {
+                        groupData.displayOptions.size *= 6;
+                    }
+
+                    nodeGroups[groupName] = groupData;
+                }
+
+                groupData.nodes.push(node);
+            });
+
+            Object.keys(nodeGroups).forEach(function(groupName) {
+                nodeGroups[groupName] = new torusvis.groups.NodeGroup(
+                    nodeGroups[groupName]
+                );
+            });
+
+            engine.setNodeGroup(nodeGroups);
+        });
+
+
+        /*
+         * promise that sets up callback functions
+         * 
+         * this promise depends on the other torusvis data structures being
+         * ready, but not on the node group
+         */
+        var whenCallbacksAreReady = (
+        whenTorusvisStructuresAreReady.then(function(structures) {
+            var engine = structures.engine;
+            var graph = structures.graph;
+
+            /* window resize callback */
+            function onResize() {
+                engine.setContainerSize(
+                    window.innerWidth,
+                    window.innerHeight
+                );
+
+                engine.render();
+            }
+
+            return { onResize: onResize };
+        }));
+
+
+        /*
+         * wait for all the callback functions, all the torusvis structures,
+         * and the page to be fully loaded; then add the torusvis-generated
+         * element to the dom and post the first render
+         */
+
+        /*
+         * global variable that will hold all the structures, in case we want to
+         * experiment with them in the developer console
+         */
+        var S;
+
+        Promise.all([
+            whenCallbacksAreReady,
+            whenTorusvisStructuresAreReady,
+            whenNodeGroupIsReady,
+            whenDomIsReady
+        ]).then(function(args) {
+            args = [{}].concat(args);
+            args.pop();
+
+            var structures = torusvis.misc.utils.extend.apply(null, args);
+            var engine = structures.engine;
+            var onResize = structures.onResize;
+
+            var out = engine.getOutput();
+
+            document.body.appendChild(out.container);
+            window.addEventListener("resize", onResize);
+
+            var target = out.controls.target;
+            target.set.apply(target, structures.treeCentroid);
+
+            out.controls.dollyIn(4);
+            engine.update();
+            onResize();
+
+            S = structures;
+        }).catch(function(e) {
+            console.log(e);
+            console.log(e.stack);
+        });
+    </script>
+  </body>
+</html>

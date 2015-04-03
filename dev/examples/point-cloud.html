@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html>
+  <link rel="stylesheet" type="text/css" href="/css/full-screen-body.css">
+  <head>
+    <meta charset="utf-8"></meta>
+    <title>torusvis - point cloud example</title>
+  </head>
+
+  <body>
+    <script src="/js/jquery/bluebird/three/torusvis"></script>
+    <script>var torusvis = require("torusvis");</script>
+    <script>var THREE = require("three");</script>
+    <script
+        src="/js/node_modules/three/examples/js/controls/OrbitControls.js"
+    ></script>
+
+    <!-- <script src="/js/torusvis.js"></script> -->
+    <script src="./js/loadImage.js"></script>
+
+    <script>
+        var three = require("three");
+        var jquery = require("jquery");
+        var Promise = require("bluebird");
+    </script>
+
+    <script>
+
+        /* change value for different display modes */
+        var DISPLAY_MODE = torusvis.misc.utils.urlArguments().keyword.mode;
+        var modeIsValid = (
+            DISPLAY_MODE === "sprite" ||
+            DISPLAY_MODE === "sphere"
+        );
+
+        if(!modeIsValid) { DISPLAY_MODE = "sprite"; }
+
+
+        /* promise that resolves when the page is fully loaded */
+        var whenDomIsReady = new Promise(function(rs, rj) { jquery(rs); });
+
+
+        /*
+         * promise that resolves when a texture image is fetched...
+         * ... or a dummy promise if DISPLAY_MODE !== "sprite"
+         */
+        var whenTextureIsLoaded;
+        if(DISPLAY_MODE === "sprite") {
+            whenTextureIsLoaded = loadImage("/img/disc.png");
+        } else {
+            whenTextureIsLoaded = Promise.resolve();
+        }
+
+
+        /*
+         * promise that resolves when all the torusvis data structures are
+         * created, except for the node group (creating the node group requires
+         * the texture)
+         */
+        var whenTorusvisStructuresAreReady = Promise.resolve().then(function() {
+            var cloudRadius = 2.0;
+            var N =  500;
+            var M = 1000;
+
+            var graph = new torusvis.graphs.DirectedGraph();
+            var nodes = new Array(N);
+
+            var i;
+
+            /*
+             * generate a cloud of random points bound within a sphere with
+             * radius === [cloudRadius]
+             */
+            var x, y, z;
+            for(i=0; i<N; ++i) {
+                do {
+                    x = cloudRadius*(2.0*Math.random() - 1.0);
+                    y = cloudRadius*(2.0*Math.random() - 1.0);
+                    z = cloudRadius*(2.0*Math.random() - 1.0);
+                } while(x*x + y*y + z*z > cloudRadius*cloudRadius);
+
+                nodes[i] = graph.newNode({
+                    position: [x, y, z]
+                });
+            }
+
+            /*
+             * generate a set of random undirected edges
+             * use an adjacency list to ensure every generated edge is unique
+             */
+            var adjacencyList = new Array(N-1);
+            var edges = new Array(M);
+            for(i=0; i<M; ++i) {
+                var iSrc, iDst;
+                var done;
+
+                do {
+                    iSrc = Math.floor(N*Math.random());
+                    do { iDst = Math.floor(N*Math.random()); }
+                    while(iSrc === iDst);
+
+                    if(iSrc > iDst) { var tmp = iSrc; iSrc = iDst; iDst = tmp; }
+
+                    var srcList = adjacencyList[iSrc] = (
+                        adjacencyList[iSrc] || {}
+                    );
+
+                    done = !(iDst in srcList);
+
+                } while(!done);
+
+                adjacencyList[iSrc][iDst] = true;
+
+                edges[i] = graph.newEdge(nodes[iSrc], nodes[iDst]);
+            }
+
+
+            var mapper = new torusvis.mappers.DirectTopologyMapper();
+
+
+            var randomEdgeGroup = new torusvis.groups.EdgeGroup({
+                edges: edges,
+                displayMode: "line",
+                displayOptions: {
+                    size: 0.015,
+                    color: 0x00FF00,
+                    opacity: 0.25
+                }
+            });
+
+
+            var engine = new torusvis.engines.ThreeJSOutputEngine(
+                graph, mapper
+            );
+
+            engine.setEdgeGroup("random", randomEdgeGroup);
+
+            return {
+                nodes: nodes,
+                engine: engine,
+                graph: graph,
+                mapper: mapper,
+                edgeGroup: randomEdgeGroup
+            };
+        });
+
+
+        /*
+         * promise that resolves when the node group is created
+         *
+         * this promise depends on the other torusvis data structures being
+         * ready and possibly the texture being loaded
+         */
+        var whenNodeGroupIsReady = Promise.all([
+            whenTextureIsLoaded,
+            whenTorusvisStructuresAreReady
+        ]).then(function(args) {
+            var displayOptions = {
+                size: 0.0325,
+                color: 0x0000FF,
+                opacity: 0.99
+            };
+
+            var texture = args[0];
+            if(DISPLAY_MODE === "sprite") {
+                displayOptions.map = texture;
+                displayOptions.size *= 6;
+            } else if(DISPLAY_MODE === "sphere") {
+                displayOptions.thetaSegments = 7;
+                displayOptions.phiSegments = 5;
+            }
+
+            var structures = args[1];
+            var engine = structures.engine;
+            var nodes = structures.nodes;
+
+            var nodeGroup = new torusvis.groups.NodeGroup({
+                nodes: nodes,
+                displayMode: DISPLAY_MODE,
+                displayOptions: displayOptions
+            });
+
+            engine.setNodeGroup("main", nodeGroup);
+
+            return {
+                nodeGroup: nodeGroup,
+                texture: texture
+            };
+        });
+
+
+        /*
+         * promise that sets up callback functions
+         * 
+         * this promise depends on the other torusvis data structures being
+         * ready, but not on the node group
+         */
+        var whenCallbacksAreReady = (
+        whenTorusvisStructuresAreReady.then(function(structures) {
+            var engine = structures.engine;
+            var graph = structures.graph;
+
+            /* window resize callback */
+            function onResize() {
+                engine.setContainerSize(
+                    window.innerWidth,
+                    window.innerHeight
+                );
+
+                engine.render();
+            }
+
+            return { onResize: onResize };
+        }));
+
+
+        /*
+         * wait for all the callback functions, all the torusvis structures,
+         * and the page to be fully loaded; then add the torusvis-generated
+         * element to the dom and post the first render
+         */
+
+        /*
+         * global variable that will hold all the structures, in case we want to
+         * experiment with them in the developer console
+         */
+        var S;
+
+        Promise.all([
+            whenCallbacksAreReady,
+            whenTorusvisStructuresAreReady,
+            whenNodeGroupIsReady,
+            whenDomIsReady
+        ]).then(function(args) {
+            args = [{}].concat(args);
+            args.pop();
+
+            var structures = torusvis.misc.utils.extend.apply(null, args);
+            var engine = structures.engine;
+            var onResize = structures.onResize;
+
+            var out = engine.getOutput();
+
+            document.body.appendChild(out.container);
+            window.addEventListener("resize", onResize);
+
+            out.controls.dollyIn(2);
+            engine.update();
+            onResize();
+
+            S = structures;
+        }).catch(function(e) {
+            console.log(e);
+            console.log(e.stack);
+        });
+    </script>
+  </body>
+</html>

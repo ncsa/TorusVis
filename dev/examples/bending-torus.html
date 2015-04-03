@@ -1,0 +1,365 @@
+<!DOCTYPE HTML>
+<html>
+  <link rel="stylesheet" type="text/css" href="/css/full-screen-body.css">
+  <head>
+    <meta charset="UTF-8">
+    <title>torusvis - bending torus experiment</title>
+  </head>
+
+  <body>
+    <script src="/js/jquery/bluebird/three/torusvis"></script>
+    <script>var torusvis = require("torusvis");</script>
+    <script>var THREE = require("three");</script>
+    <script
+        src="/js/node_modules/three/examples/js/controls/OrbitControls.js"
+    ></script>
+
+    <!-- <script src="/js/torusvis.js"></script> -->
+    <script src="./js/loadImage.js"></script>
+
+    <script>
+        var three = require("three");
+        var jquery = require("jquery");
+        var Promise = require("bluebird");
+    </script>
+
+    <script>
+        /* change value for different display modes */
+        var DISPLAY_MODE = torusvis.misc.utils.urlArguments().keyword.mode;
+        var modeIsValid = (
+            DISPLAY_MODE === "sprite" ||
+            DISPLAY_MODE === "sphere"
+        );
+
+        if(!modeIsValid) { DISPLAY_MODE = "sprite"; }
+
+
+        /* promise that resolves when the page is fully loaded */
+        var whenDomIsReady = new Promise(function(rs, rj) { jquery(rs); });
+
+
+        /*
+         * promise that resolves when a texture image is fetched...
+         * ... or a dummy promise if DISPLAY_MODE !== "sprite"
+         */
+        var whenTextureIsLoaded;
+        if(DISPLAY_MODE === "sprite") {
+            whenTextureIsLoaded = loadImage("/img/disc.png");
+        } else {
+            whenTextureIsLoaded = Promise.resolve();
+        }
+
+
+        /*
+         * promise that resolves when all the torusvis data structures are
+         * created, except for the node group (creating the node group requires
+         * the texture)
+         */
+        var whenTorusvisStructuresAreReady = Promise.resolve().then(function() {
+            var graph = new torusvis.graphs.DirectedGraph();
+
+            var N = [11, 11, 11];
+            var center = [0.0, 0.0, 0.0];
+            var dims = [10.0, 10.0, 10.0];
+            var dr = [ dims[0]/N[0], dims[1]/N[1], dims[2]/N[2] ];
+            var dimBounds = [
+                [
+                    center[0] - 0.5*dims[0],
+                    center[1] - 0.5*dims[1],
+                    center[2] - 0.5*dims[2]
+                ], [
+                    center[0] + 0.5*dims[0],
+                    center[1] + 0.5*dims[1],
+                    center[2] + 0.5*dims[2]
+                ]
+            ];
+         
+            var boxDimensions  = new three.Vector3(dims[0], dims[1], dims[2]);
+            var gridDimensions = new three.Vector3(   N[0],    N[1],    N[2]);
+
+            var N01  = N[0]*N[1];
+            var N02  = N[0]*N[2];
+            var N12  = N[1]*N[2];
+            var NN = N01*N[2];
+            var nodes = new Array(NN);
+            var originalPositions = new Array(NN);
+
+            var lerp = torusvis.misc.gmath.lerp;
+            var rem, i, j, k;
+            for(var I=0; I<NN; ++I) {
+                rem = I;
+                i = Math.floor(rem/N12) ; rem %= N12;
+                j = Math.floor(rem/N[2]) ; rem %= N[2];
+                k = rem;
+
+                var x = lerp(i, 0, N[0] - 1, dimBounds[0][0], dimBounds[1][0]);
+                var y = lerp(j, 0, N[1] - 1, dimBounds[0][1], dimBounds[1][1]);
+                var z = lerp(k, 0, N[2] - 1, dimBounds[0][2], dimBounds[1][2]);
+
+                originalPositions[I] = new three.Vector3(x, y, z);
+                nodes[I] = graph.newNode({
+                    position: [x, y, z]
+                });
+            }
+
+            var mapper = new torusvis.mappers.DirectTopologyMapper();
+            engine = new torusvis.engines.ThreeJSOutputEngine(graph, mapper);
+
+            /* also, create a few extra three.js objects */
+            var gridGeometry = new three.BoxGeometry(
+                dims[0], dims[1], dims[2],
+                N[0]-1 , N[1]-1 , N[2]-1
+            );
+
+            gridGeometry.dynamic = true;
+
+            var bendingCube = new three.Mesh(
+                gridGeometry,
+                new three.MeshBasicMaterial({ color: 0x221122, opacity:0.15 })
+            );
+            bendingCube.material.wireframe = true;
+            bendingCube.material.transparent = true;
+
+            var cube = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.MeshBasicMaterial({ color: 0x0000ff })
+            );
+            cube.material.wireframe = true;
+
+            var torusMapper = torusvis.misc.gmath.torusMapper({
+                center: new THREE.Vector3(center[0], center[1], center[2]),
+                boxDimensions: boxDimensions,
+                gridDimensions: gridDimensions,
+                radiusRatio: 0.50,
+                crossFadeFactor: 0.01
+            });
+
+            var out = engine.getOutput();
+            out.scene.add(cube);
+            out.scene.add(bendingCube);
+
+            return {
+                nodes: nodes,
+                graph: graph,
+                mapper: mapper,
+                engine: engine,
+
+                gridGeometry: gridGeometry,
+
+                torusMapper: torusMapper,
+                originalPositions: originalPositions,
+                NN: NN
+            };
+        });
+
+        /*
+         * promise that resolves when the node group is created
+         *
+         * this promise depends on the other torusvis data structures being
+         * ready and possibly the texture being loaded
+         */
+        var whenNodeGroupIsReady = Promise.all([
+            whenTextureIsLoaded,
+            whenTorusvisStructuresAreReady
+        ]).then(function(args) {
+            var displayOptions = {
+                size: 0.05,
+                color: 0xFFFFFF,
+                opacity: 0.99
+            };
+
+            var texture = args[0];
+            if(DISPLAY_MODE === "sprite") {
+                displayOptions.map = texture;
+                displayOptions.size *= 6;
+            } else if(DISPLAY_MODE === "sphere") {
+                displayOptions.thetaSegments = 3;
+                displayOptions.phiSegments = 3;
+            }
+
+            var structures = args[1];
+            var nodes = structures.nodes;
+            var engine = structures.engine;
+
+            var nodeGroup = new torusvis.groups.NodeGroup({
+                nodes: nodes,
+                displayMode: DISPLAY_MODE,
+                displayOptions: displayOptions
+            });
+
+            engine.setNodeGroup("main", nodeGroup);
+
+            return {
+                nodeGroup: nodeGroup,
+                texture: texture
+            };
+        });
+ 
+
+        /*
+         * promise that sets up several callback functions
+         * 
+         * this promise depends on the other torusvis data structures being
+         * ready, but not on the node group
+         */
+        var whenCallbacksAreReady = (
+        whenTorusvisStructuresAreReady.then(function(structures) {
+            var engine = structures.engine;
+            var graph = structures.graph;
+            var mapper = structures.mapper;
+            var nodes = structures.nodes;
+            var cube = structures.cube;
+            var bendingCube = structures.bendingCube;
+
+            /* window resize callback */
+            function onResize() {
+                engine.setContainerSize(
+                    window.innerWidth,
+                    window.innerHeight
+                );
+
+                engine.render();
+            }
+
+            /* callbacks and functions for the render loop */
+
+            /*
+             * first, set up a function that repositions the nodes in the scene.
+             * [a] controls the state of the transition to use (0.0 for straight
+             * on, 1.0 for fully bent)
+             */
+            var torusMapper = structures.torusMapper;
+            var originalPositions = structures.originalPositions;
+            var gridGeometry = structures.gridGeometry;
+            var NN = structures.NN;
+            var originalGridPositions;
+            var stpFirst = true;
+
+            function setTorusParameter(a) {
+                var i;
+                for(i=0; i<NN; ++i) {
+                    var r = torusMapper(
+                        new THREE.Vector3().copy(originalPositions[i]), a
+                    );
+
+                    graph.nodeData(nodes[i]).position[0] = r.x;
+                    graph.nodeData(nodes[i]).position[1] = r.y;
+                    graph.nodeData(nodes[i]).position[2] = r.z;
+                }
+
+                var N = gridGeometry.vertices.length;
+                if(stpFirst) {
+                    originalGridPositions = new Array(N);
+                    for(i=0; i<N; ++i) {
+                        originalGridPositions[i] = (
+                            new THREE.Vector3().copy(gridGeometry.vertices[i])
+                        );
+                    }
+                    stpFirst = false;
+                } else {
+                    for(i=0; i<N; ++i) {
+                        gridGeometry.vertices[i].copy(originalGridPositions[i]);
+                    }
+                }
+
+                for(i=0; i<N; ++i) {
+                    torusMapper(gridGeometry.vertices[i], a);
+                }
+
+                gridGeometry.verticesNeedUpdate = true;
+            }
+
+            /* next, the render loop, proper */
+            var epoch = null; // set on the first render
+            var tOffset = 0; // used when starting again after stopping
+            var t;
+            var animationIsRunning = false;
+
+            function animationCallback(timestamp) {
+                if(!animationIsRunning) { return; }
+
+                if(torusvis.misc.utils.isNull(epoch)) { epoch = timestamp; }
+
+                t = 0.001*(timestamp - epoch) + tOffset;
+                var torusParameter = 0.5*(1 - Math.cos(t));
+                setTorusParameter(torusParameter);
+
+                engine.iterNodeGroups(function(group, groupName) {
+                    delete engine.getNodeGroupCache(groupName).geometry;
+                });
+
+                engine.update();
+                engine.render();
+
+                /* loop */
+                requestAnimationFrame(animationCallback);
+            }
+
+            function startAnimation() {
+                if(animationIsRunning) { return; }
+                animationIsRunning = true;
+                requestAnimationFrame(animationCallback);
+            }
+
+            function stopAnimation() {
+                if(!animationIsRunning) { return; }
+                animationIsRunning = false;
+                tOffset = t;
+                epoch = null;
+            }
+
+            return {
+                onResize: onResize,
+                start: startAnimation,
+                stop: stopAnimation
+            };
+        }));
+
+ 
+        /*
+         * wait for all the callback functions, all the torusvis structures,
+         * and the page to be fully loaded; then add the torusvis-generated
+         * element to the dom and start the animation
+         */
+
+        /*
+         * global variable that will hold all the structures, in case we want to
+         * experiment with them in the developer console
+         */
+        var S;
+
+        Promise.all([
+            whenCallbacksAreReady,
+            whenTorusvisStructuresAreReady,
+            whenNodeGroupIsReady,
+            whenDomIsReady
+        ]).then(function(args) {
+            args = [{}].concat(args);
+            args.pop();
+
+            var structures = torusvis.misc.utils.extend.apply(null, args);
+            var engine = structures.engine;
+            var onResize = structures.onResize;
+            var start = structures.start;
+
+            var out = engine.getOutput();
+
+            document.body.appendChild(out.container);
+            window.addEventListener("resize", onResize);
+
+            out.renderer.setClearColor(0xCCCCCC);
+
+            out.controls.dollyOut(2);
+            engine.update();
+            onResize();
+            start();
+
+            S = structures;
+        }).catch(function(e) {
+            console.log(e);
+            console.log(e.stack);
+        });
+    </script>
+  </body>
+</html>
+
