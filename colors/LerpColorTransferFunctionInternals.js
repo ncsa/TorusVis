@@ -1,7 +1,8 @@
 
-/*
- * Module: LerpColorTransferFunctionInternals
- * (*INTERNAL*)
+/**
+ * @class LerpColorTransferFunctionInternals
+ * @private
+ * @ingroup torusvis_colors
  */
 
 "use strict";
@@ -10,50 +11,47 @@ var utils = require("../misc/utils");
 var COLOR_TRANSFER_MODE = require("./COLOR_TRANSFER_MODE");
 
 module.exports = {
-    /*
-     * Function: clipColor
+    /**
+     * @fn Boolean clipColor(LerpColorTransferFunction self, Object tmp)
+     * @brief clips a given scalar value according to the given
+     * @ref LerpColorTransferFunction "LerpColorTransferFunction's" overflow and
+     * underflow modes
+     * @private
      *
-     * (*INTERNAL*) clips a given scalar value according to the given
-     * <LerpColorTransferFunction>'s overflow and underflow modes
+     * @param[in] self the given @ref LerpColorTransferFunction
+     * @param[in,out] tmp object containing the given scalar attribute
+     *                ```.value```
      *
-     * Parameters:
-     *     self - (*<LerpColorTransferFunction>*) the given
-     *            <LerpColorTransferFunction>
+     * @return ```false```, unless
+     *  - ```tmp.value > 1```; *and*
+     *  - the given
+     *    @ref LerpColorTransferFunction "LerpColorTransferFunction's" overflow
+     *    mode is set to @ref COLOR_TRANSFER_MODE.SATURATE; *and*
+     *  - an overflow color has been set \n
+     *  *or* \n
+     *  - ```tmp.value < 0```; *and*
+     *  - the given
+     *    @ref LerpColorTransferFunction "LerpColorTransferFunction's" underflow
+     *    mode is set to @ref COLOR_TRANSFER_MODE.SATURATE; *and*
+     *  - an underflow color has been set
      *
-     *     tmp - (*Object*) object containing the given scalar attribute
-     *           *.value*
+     * ####Note
+     * If ```tmp.value > 1``` and the given
+     * @ref LerpColorTransferFunction "LerpColorTransferFunction's" overflow
+     * mode is set to @ref COLOR_TRANSFER_MODE.REPEAT, then the given scalar
+     * will be modulated to lie within [0, 1], and similarly if
+     * ```tmp.value < 0``` and the given
+     * @ref LerpColorTransferFunction "LerpColorTransferFunction's" underflow
+     * mode is set to @ref COLOR_TRANSFER_MODE.REPEAT.
      *
-     * Returns:
-     *      - (*Boolean*) *true* if:
+     * @sa @ref LerpColorTransferFunction.computeColor
+     * @sa @ref AbstractColorTransferFunction.setOverflowColor
+     * @sa @ref AbstractColorTransferFunction.setOverflowMode
+     * @sa @ref AbstractColorTransferFunction.setUnderflowColor
+     * @sa @ref AbstractColorTransferFunction.setUnderflowMode
+     * @sa @ref COLOR_TRANSFER_MODE
      *
-     *           - *tmp.value* > 1, the given <LerpColorTransferFunction>'s
-     *             overflow mode is set to <COLOR_TRANSFER_MODE.SATURATE>, and
-     *             an overflow color has been set
-     *
-     *           or:
-     *
-     *           - *tmp.value* < 0, the given <LerpColorTransferFunction>'s
-     *             underflow mode is set to <COLOR_TRANSFER_MODE.SATURATE>, and
-     *             an underflow color has been set
-     *
-     *           In either case, *tmp.color* is set to the computed color based
-     *           on the scalar value after clipping.
-     *
-     * Note:
-     *
-     *      If *tmp.value* > 1 and the given <LerpColorTransferFunction>'s
-     *      overflow mode is set to <COLOR_TRANSFER_MODE.REPEAT>, then the given
-     *      scalar will be modulated to lie within [0, 1], and similarly if
-     *      *tmp.value* < 0 and the given <LerpColorTransferFunction>'s
-     *      underflow mode is set to <COLOR_TRANSFER_MODE.REPEAT>.
-     *
-     * See also:
-     *      - <LerpColorTransferFunction.computeColor>
-     *      - <AbstractColorTransferFunction.setOverflowColor>
-     *      - <AbstractColorTransferFunction.setOverflowMode>
-     *      - <AbstractColorTransferFunction.setUnderflowColor>
-     *      - <AbstractColorTransferFunction.setUnderflowMode>
-     *      - <COLOR_TRANSFER_MODE>
+     * @memberof LerpColorTransferFunctionInternals
      */
     computeClipColor:
     function computeClipColor(self, tmp) {
@@ -85,6 +83,13 @@ module.exports = {
         return result;
    },
 
+    /**
+     * @fn Array<Number>                                             \\
+     *     colorLookup(LerpColorTransferFunction self, Number value)
+     * @private
+     *
+     * @memberof LerpColorTransferFunctionInternals
+     */
    colorLookup:
    function colorLookup(self, value) {
         var index = utils.bisect(self.markers, value);

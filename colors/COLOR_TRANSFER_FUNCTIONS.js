@@ -1,11 +1,9 @@
 
-/*
- * Module: COLOR_TRANSFER_FUNCTIONS
- *
- * prepopulated collection of <LerpColorTransferFunctions>
- *
- * See also:
- *      - <LerpColorTransferFunction>
+/**
+ * @class COLOR_TRANSFER_FUNCTIONS
+ * @brief prepopulated collection of
+ * @ref AbstractColorTransferFunction "AbstractColorTransferFunctions"
+ * @sa @ref LerpColorTransferFunction
  */
 
 "use strict";
@@ -39,25 +37,24 @@ function lctf(table) {
     return result;
 }
 
-/*
- * Variable: binary
- */
-
-/*
- * Variable: hot
- */
-
-/*
- * Variable: seismic
- */
-
 var COLOR_TRANSFER_FUNCTIONS = {
-
+    /**
+     * @var LerpColorTransferFunction binary
+     * @static
+     *
+     * @memberof COLOR_TRANSFER_FUNCTIONS
+     */
     binary: lctf([
         0   , 1   , 1   , 1   ,
         1   , 0   , 0   , 0
     ]),
 
+    /**
+     * @var LerpColorTransferFunction hot
+     * @static
+     *
+     * @memberof COLOR_TRANSFER_FUNCTIONS
+     */
     hot: lctf([
         0   , 0   , 0   , 0   ,
         0.25, 0.47, 0   , 0   ,
@@ -66,6 +63,12 @@ var COLOR_TRANSFER_FUNCTIONS = {
         1   , 1   , 1   , 1
     ]),
 
+    /**
+     * @var LerpColorTransferFunction seismic
+     * @static
+     *
+     * @memberof COLOR_TRANSFER_FUNCTIONS
+     */
     seismic: lctf([
         0   , 0   , 0   , 1   ,
         0.5 , 1   , 1   , 1   ,

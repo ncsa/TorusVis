@@ -1,22 +1,23 @@
 
-/*
- * Class: AbstractColorTransferFunction
+/**
+ * @class AbstractColorTransferFunction
+ * @brief color transfer function foundation class
+ * @pure
  *
- * (*ABSTRACT*) color transfer function foundation class
- *
- * defines the generic API for color transfer functions.  A color transfer
- * function represents a function that maps a scalar value to a color.
- * <AbstractColorTransferFunction> instances represent colors as an array of 3
- * values between 0 and 1; each for the red, green, and blue components of the
+ * @details defines the generic API for color transfer functions.  A color
+ * transfer function represents a function that maps a scalar value to a color.
+ * @ref AbstractColorTransferFunction instances represent colors as an array of
+ * 3 values between 0 and 1; each for the red, green, and blue components of the
  * color, respectively.  The mapping is typically from a fixed range, such as
  * [0, 1].  Scalar values that fall above and below that range trigger the color
  * transfer function's overflow and underflow behaviors, respectively.
  *
- * Subclasses of <AbstractColorTransferFunction> need to override the
- * <computeColor> method, which is where the mapping occurs.
+ * Subclasses of @ref AbstractColorTransferFunction need to override the @ref
+ * computeColor method, which is where the mapping occurs.
  *
- * See also:
- *      - <LerpColorTransferFunction>
+ * @sa @ref LerpColorTransferFunction
+ *
+ * @ingroup torusvis_colors
  */
 
 
@@ -25,108 +26,112 @@
 var utils = require("../misc/utils");
 var COLOR_TRANSFER_MODE = require("./COLOR_TRANSFER_MODE");
 
+/**
+ * @fn AbstractColorTransferFunction()
+ * @pure
+ *
+ * @memberof AbstractColorTransferFunction
+ */
 function AbstractColorTransferFunction() { utils._abstract_(); }
 
 utils.extend(AbstractColorTransferFunction.prototype, {
     constructor: AbstractColorTransferFunction,
 
-    setOverflowColor:
-    /*
-     * Method: setOverflowColor
+    /**
+     * @fn AbstractColorTransferFunction setOverflowColor(Array<Number> color)
+     * @brief set the color to use for overflow values
      *
-     * set the color to use for overflow values
+     * @param[in] color color to use for overflow values
      *
-     * Parameters:
-     *     color - (*array*) color to use for overflow values
+     * @return ```this```
      *
-     * See also:
-     *      - <setOverflowMode>
-     *      - <setUnderflowColor>
-     *      - <setUnderflowMode>
-     *      - <computeColor>
+     * @sa @ref setOverflowMode
+     * @sa @ref setUnderflowColor
+     * @sa @ref setUnderflowMode
+     * @sa @ref computeColor
+     *
+     * @memberof AbstractColorTransferFunction
      */
+    setOverflowColor:
     function setOverflowColor(color) {
         this.overflowColor = color;
+        return this;
     },
 
-    setUnderflowColor:
-    /*
-     * Method: setUnderflowColor
+    /**
+     * @fn AbstractColorTransferFunction setUnderflowColor(Array<Number> color)
+     * @brief set the color to use for underflow values
      *
-     * set the color to use for underflow values
+     * @param[in] color color to use for underflow values
      *
-     * Parameters:
-     *     color - (*array*) color to use for underflow values
+     * @return ```this```
      *
-     * See also:
-     *      - <setOverflowColor>
-     *      - <setOverflowMode>
-     *      - <setUnderflowMode>
-     *      - <computeColor>
+     * @sa @ref setOverflowColor
+     * @sa @ref setOverflowMode
+     * @sa @ref setUnderflowMode
+     * @sa @ref computeColor
+     *
+     * @memberof AbstractColorTransferFunction
      */
+    setUnderflowColor:
     function setUnderflowColor(color) {
         this.underflowColor = color;
     },
 
-    getOverflowColor:
-    /*
-     * Method: getOverflowColor
+    /**
+     * @fn Array<Number> getOverflowColor()
+     * @brief return the color for overflow values
+     * @return the color for overflow values
      *
-     * return the color for overflow values
+     * @sa @ref getOverflowMode
+     * @sa @ref getUnderflowColor
+     * @sa @ref getUnderflowMode
+     * @sa @ref computeColor
      *
-     * Returns:
-     *      - (*array*) the color for overflow values
-     *
-     * See also:
-     *      - <getOverflowMode>
-     *      - <getUnderflowColor>
-     *      - <getUnderflowMode>
-     *      - <computeColor>
+     * @memberof AbstractColorTransferFunction
      */
+    getOverflowColor:
     function getOverflowColor() {
         return this.overflowColor || null;
     },
 
-    getUnderflowColor:
-    /*
-     * Method: getUnderflowColor
+    /**
+     * @fn Array<Number> getUnderflowColor()
+     * @brief return the color for underflow values
+     * @return the color for underflow values
      *
-     * return the color for underflow values
+     * @sa @ref getOverflowColor
+     * @sa @ref getOverflowMode
+     * @sa @ref getUnderflowMode
+     * @sa @ref computeColor
      *
-     * Returns:
-     *      - (*array*) the color for underflow values
-     *
-     * See also:
-     *      - <getOverflowColor>
-     *      - <getOverflowMode>
-     *      - <getUnderflowMode>
-     *      - <computeColor>
+     * @memberof AbstractColorTransferFunction
      */
+    getUnderflowColor:
     function getUnderflowColor() {
         return this.underflowColor || null;
     },
 
-    setOverflowMode:
-    /*
-     * Method: setOverflowMode
+    /**
+     * @fn AbstractColorTransferFunction             \\
+     *     setOverflowMode(COLOR_TRANSFER_MODE mode)
      *
-     * set the behavior for overflow values
+     * @brief set the behavior for overflow values
      *
-     * sets the behavior for overflow values.  See <COLOR_TRANSFER_MODE> for
-     * details on available modes.
+     * @param[in] mode mode for overflow values
      *
-     * Parameters:
-     *     mode - (*<COLOR_TRANSFER_MODE>*) mode for overflow values
+     * @return ```this```
      *
-     * Throws:
-     *      - (*Error*) if the given mode is not valid
+     * @throws Error if the given mode is not valid
      *
-     * See also:
-     *      - <setOverflowColor>
-     *      - <setUnderflowColor>
-     *      - <setUnderflowMode>
-     *      - <computeColor>
+     * @sa @ref setOverflowColor
+     * @sa @ref setUnderflowColor
+     * @sa @ref setUnderflowMode
+     * @sa @ref computeColor
+     *
+     * @memberof AbstractColorTransferFunction
      */
+    setOverflowMode:
     function setOverflowMode(mode) {
         if((mode !== COLOR_TRANSFER_MODE.SATURATE) &&
            (mode !== COLOR_TRANSFER_MODE.REPEAT  )) {
@@ -136,46 +141,44 @@ utils.extend(AbstractColorTransferFunction.prototype, {
         this.overflowMode = mode;
     },
 
-    getOverflowMode:
-    /*
-     * Method: getOverflowMode
+    /**
+     * @fn COLOR_TRANSFER_MODE getOverflowMode()
+     * @brief return the mode for overflow values
      *
-     * return the mode for overflow values
+     * @return the mode for overflow values
      *
-     * Returns:
-     *      - (*<COLOR_TRANSFER_MODE>*) the mode for overflow values
+     * @sq @ref getOverflowColor
+     * @sq @ref getUnderflowColor
+     * @sq @ref getUnderflowMode
+     * @sq @ref computeColor
      *
-     * See also:
-     *      - <getOverflowColor>
-     *      - <getUnderflowColor>
-     *      - <getUnderflowMode>
-     *      - <computeColor>
+     * @memberof AbstractColorTransferFunction
      */
+    getOverflowMode:
     function getOverflowMode() {
         return this.overflowMode;
     },
 
-    setUnderflowMode:
-    /*
-     * Method: setUnderflowMode
+    /**
+     * @fn AbstractColorTransferFunction              \\
+     *     setUnderflowMode(COLOR_TRANSFER_MODE mode)
      *
-     * set the behavior for underflow values
+     * @brief set the behavior for underflow values
      *
-     * sets the behavior for underflow values.  See <COLOR_TRANSFER_MODE> for
-     * details on available modes.
+     * @param[in] mode mode for underflow values
      *
-     * Parameters:
-     *     mode - (*<COLOR_TRANSFER_MODE>*) mode for underflow values
+     * @return ```this```
      *
-     * Throws:
-     *      - (*Error*) if the given mode is not valid
+     * @throws Error if the given mode is not valid
      *
-     * See also:
-     *      - <setOverflowColor>
-     *      - <setOverflowMode>
-     *      - <setUnderflowColor>
-     *      - <computeColor>
+     * @sa @ref setOverflowColor
+     * @sa @ref setOverflowMode
+     * @sa @ref setUnderflowColor
+     * @sa @ref computeColor
+     *
+     * @memberof AbstractColorTransferFunction
      */
+    setUnderflowMode:
     function setUnderflowMode(mode) {
         if((mode !== COLOR_TRANSFER_MODE.SATURATE) &&
            (mode !== COLOR_TRANSFER_MODE.REPEAT  )) {
@@ -185,43 +188,36 @@ utils.extend(AbstractColorTransferFunction.prototype, {
         this.underflow = mode;
     },
 
-    getUnderflowMode:
-    /*
-     * Method: getUnderflowMode
+    /**
+     * @fn COLOR_TRANSFER_MODE getUnderflowMode()
+     * @brief return the mode for underflow values
      *
-     * return the mode for underflow values
+     * @return the mode for underflow values
      *
-     * Returns:
-     *      - (*<COLOR_TRANSFER_MODE>*) the mode for underflow values
+     * @sa @ref getOverflowColor
+     * @sa @ref getOverflowMode
+     * @sa @ref getUnderflowColor
+     * @sa @ref computeColor
      *
-     * See also:
-     *      - <getOverflowColor>
-     *      - <getOverflowMode>
-     *      - <getUnderflowColor>
-     *      - <computeColor>
+     * @memberof AbstractColorTransferFunction
      */
+    getUnderflowMode:
     function getUnderflowMode() {
         return this.underflow;
     },
 
-    computeColor: (
-    /*
-     * Method: computeColor
+    /**
+     * @fn Array<Number> computeColor(Number value)
+     * @brief map the given scalar value to its corresponding color
+     * @pure
      *
-     * (*Abstract*) map the given scalar value to its corresponding color
+     * @param[in] value scalar value to map
      *
-     * Parameters:
-     *     value - (*number*) scalar value to map
+     * @return the color corresponding to the given scalar
      *
-     * Returns:
-     *      - (*array*) the color corresponding to the given scalar
+     * @memberof AbstractColorTransferFunction
      */
-    function computeColor(value) {
-        /* documentation stub */
-    },
-
-        utils._abstract_
-    )[1]
+    computeColor: utils._abstract_
 });
 
 module.exports = AbstractColorTransferFunction;

@@ -1,14 +1,13 @@
 
-/*
- * Class: LerpColorTransferFunction
+/**
+ * @class LerpColorTransferFunction
+ * @brief linearly interpolated color lookup tables
  *
- * linearly interpolated color lookup tables
+ * @details @ref LerpColorTransferFunction "LerpColorTransferFunctions" map
+ * scalar values to colors by maintaining an internal table of value-color
+ * pairs, sorted by value.
  *
- * <LerpColorTransferFunctions> map scalar values to colors by maintaining an
- * internal table of value-color pairs, sorted by value.
- *
- * Extends:
- *      - <AbstractColorTransferFunction>
+ * @extends AbstractColorTransferFunction
  */
 
 "use strict";
@@ -18,8 +17,10 @@ var AbstractColorTransferFunction = require("./AbstractColorTransferFunction");
 
 var _private_ = require("./LerpColorTransferFunctionInternals");
 
-/*
- * Constructor: constructor
+/**
+ * @fn LerpColorTransferFunction()
+ *
+ * @memberof LerpColorTransferFunction
  */
 function LerpColorTransferFunction() {
     this.markers = [];
@@ -34,22 +35,23 @@ utils.extend(
 utils.extend(LerpColorTransferFunction.prototype, {
     constructor: LerpColorTransferFunction,
 
-    setMarker:
-    /*
-     * Method: setMarker
+    /**
+     * @fn LerpColorTransferFunction                    \\
+     *     setMarker(Number value, Array<Number> color)
      *
-     * set or add a marker mapping the given scalar value to the given color
+     * @brief set or add a marker mapping the given scalar value to the given
+     * color
      *
-     * Parameters:
-     *     value - (*Number*) the given scalar value
-     *     color - (*Array*) the given color in floating point RGB format
+     * @param[in] value the given scalar value
+     * @param[in] color the given color
      *
-     * Returns:
-     *      - (*<LerpColorTransferFunction>*) *this*
+     * @return ```this```
      *
-     * See also:
-     *      - <computeColor>
+     * @sa @ref computeColor
+     *
+     * @memberof LerpColorTransferFunction
      */
+    setMarker:
     function setMarker(value, color) {
         if(value > 1) { value = 1; }
         if(value < 0) { value = 0; }
@@ -65,39 +67,33 @@ utils.extend(LerpColorTransferFunction.prototype, {
         return this;
     },
 
-    computeColor:
-    /*
-     * Method: computeColor
+    /**
+     * @fn Array<Number> computeColor(Number value)
+     * @brief compute the color corresponding to the given scalar value
      *
-     * compute the color corresponding to the given scalar value
+     * @details computes the color corresponding to the given scalar value.
+     * Colors are computed by fetching the color corresponding to the given
+     * scalar, or linearly interpolating between the two colors corresponding to
+     * the scalar values bounding the given scalar.
      *
-     * computes the color corresponding to the given scalar value.  Colors are
-     * computed by fetching the color corresponding to the given scalar, or
-     * linearly interpolating between the two colors corresponding to the scalar
-     * values bounding the given scalar.
+     * @param[in] value the given scalar value
      *
-     * Parameters:
-     *     value - (*Number*) the given scalar value
+     * @return the color corresponding to the given scalar value in floating
+     * point RGB format, or *null* if the given scalar value is invalid
      *
-     * Returns:
-     *      - (*Array*) the color corresponding to the given scalar value in
-     *        floating point RGB format, or *null* if the given scalar value is
-     *        invalid
+     * @sa @ref setMarker
+     * @sa @ref AbstractColorTransferFunction.getOverflowColor
+     * @sa @ref AbstractColorTransferFunction.setOverflowColor
+     * @sa @ref AbstractColorTransferFunction.getOverflowMode
+     * @sa @ref AbstractColorTransferFunction.setOverflowMode
+     * @sa @ref AbstractColorTransferFunction.getUnderflowColor
+     * @sa @ref AbstractColorTransferFunction.setUnderflowColor
+     * @sa @ref AbstractColorTransferFunction.getUnderflowMode
+     * @sa @ref AbstractColorTransferFunction.setUnderflowMode
      *
-     * Implements:
-     *      - <AbstractColorTransferFunction.computeColor>
-     *
-     * See also:
-     *      - <setMarker>
-     *      - <AbstractColorTransferFunction.getOverflowColor>
-     *      - <AbstractColorTransferFunction.setOverflowColor>
-     *      - <AbstractColorTransferFunction.getOverflowMode>
-     *      - <AbstractColorTransferFunction.setOverflowMode>
-     *      - <AbstractColorTransferFunction.getUnderflowColor>
-     *      - <AbstractColorTransferFunction.setUnderflowColor>
-     *      - <AbstractColorTransferFunction.getUnderflowMode>
-     *      - <AbstractColorTransferFunction.setUnderflowMode>
+     * @memberof LerpColorTransferFunction
      */
+    computeColor:
     function computeColor(value) {
         var self = { value: value };
 
@@ -107,7 +103,6 @@ utils.extend(LerpColorTransferFunction.prototype, {
 
         /*
          * [value] should have been properly clipped by now
-         *
          * If it has not, then treat it as an invalid value.
          */
         if(value < 0 || value > 1) {

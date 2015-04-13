@@ -1,4 +1,9 @@
 
+/**
+ * @defgroup torusvis_colors colors
+ * @brief color mapping subpackage
+ * @ingroup torusvis
+ */
 module.exports = {
     AbstractColorTransferFunction:
         require("./colors/AbstractColorTransferFunction"),
