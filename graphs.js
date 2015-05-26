@@ -1,9 +1,6 @@
 
-/**
- * @defgroup torusvis_graphs graphs
- * @brief graph data structures
- * @ingroup torusvis
- */
+/** @file */
+
 module.exports = {
     AbstractGraph    : require("./graphs/AbstractGraph"   ),
     DirectedGraph    : require("./graphs/DirectedGraph"   ),

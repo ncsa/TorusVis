@@ -1,8 +1,5 @@
 
-/*
- * Module: ThreeJSSceneNodeOutputEngineInternals
- * (*INTERNAL*) private update internal functions
- */
+/** @file */
 
 "use strict";
 
@@ -12,10 +9,6 @@ var features = require("../misc/features");
 var threejs = features.get("threejs");
 
 var _private_ = {
-    /*
-     * Function: updateNodeGroupGeometrySprites
-     * (*INTERNAL*)
-     */
     updateNodeGroupGeometrySprites:
     function updateNodeGroupGeometrySprites(self, nodeGroup, cacheEntry) {
         var displayOptions = nodeGroup.displayOptions;
@@ -54,10 +47,6 @@ var _private_ = {
         return geometry;
     },
 
-    /*
-     * Function: updateNodeGroupGeometrySpheres
-     * (*INTERNAL*)
-     */
     updateNodeGroupGeometrySpheres:
     function updateNodeGroupGeometrySpheres(self, nodeGroup, cacheEntry) {
         var displayOptions = nodeGroup.displayOptions;
@@ -98,10 +87,6 @@ var _private_ = {
         return geometry;
     },
 
-    /*
-     * Function: updateNodeGroupGeometry
-     * (*INTERNAL*)
-     */
     updateNodeGroupGeometry:
     function updateNodeGroupGeometry(self, groupName) {
         var cacheEntry = self.getNodeGroupCache(groupName);
@@ -123,10 +108,6 @@ var _private_ = {
         delete cacheEntry.actor;
     },
 
-    /*
-     * Function: updateNodeGroupMaterialSprites
-     * (*INTERNAL*)
-     */
     updateNodeGroupMaterialSprites:
     function updateNodeGroupMaterialSprites(self, nodeGroup, cacheEntry) {
         var displayOptions = nodeGroup.displayOptions;
@@ -151,10 +132,6 @@ var _private_ = {
         return material;
     },
 
-    /*
-     * Function: updateNodeGroupMaterialSpheres
-     * (*INTERNAL*)
-     */
     updateNodeGroupMaterialSpheres:
     function updateNodeGroupMaterialSpheres(self, nodeGroup, cacheEntry) {
         var displayOptions = nodeGroup.displayOptions;
@@ -170,10 +147,6 @@ var _private_ = {
         return material;
     },
 
-    /*
-     * Function: updateNodeGroupMaterial
-     * (*INTERNAL*)
-     */
     updateNodeGroupMaterial:
     function updateNodeGroupMaterial(self, groupName) {
         var cacheEntry = self.getNodeGroupCache(groupName);
@@ -195,10 +168,6 @@ var _private_ = {
         delete cacheEntry.actor;
     },
 
-    /*
-     * Function: updateNodeGroupActorSprites
-     * (*INTERNAL*)
-     */
     updateNodeGroupActorSprites:
     function updateNodeGroupActorSprites(self, nodeGroup, cacheEntry) {
         var actor = new threejs.ParticleSystem(
@@ -211,10 +180,6 @@ var _private_ = {
         return actor;
     },
 
-    /*
-     * Function: updateNodeGroupActorSpheres
-     * (*INTERNAL*)
-     */
     updateNodeGroupActorSpheres:
     function updateNodeGroupActorSpheres(self, nodeGroup, cacheEntry) {
         var actor = new threejs.Mesh(
@@ -225,10 +190,6 @@ var _private_ = {
         return actor;
     },
 
-    /*
-     * Function: updateNodeGroupActor
-     * (*INTERNAL*)
-     */
     updateNodeGroupActor:
     function updateNodeGroupActor(self, groupName) {
         var cacheEntry = self.getNodeGroupCache(groupName);
@@ -256,10 +217,6 @@ var _private_ = {
         sceneNode.add(cacheEntry.actor);
     },
 
-    /*
-     * Function: updateEdgeGroupGeometryLines
-     * (*INTERNAL*)
-     */
     updateEdgeGroupGeometryLines:
     function updateEdgeGroupGeometryLines(self, edgeGroup, cacheEntry) {
         var displayOptions = edgeGroup.displayOptions;
@@ -318,10 +275,6 @@ var _private_ = {
         return geometry;
     },
 
-    /*
-     * Function: updateEdgeGroupGeometryCylinders
-     * (*INTERNAL*)
-     */
     updateEdgeGroupGeometryCylinders:
     function updateEdgeGroupGeometryCylinders(self, edgeGroup, cacheEntry) {
         var displayOptions = edgeGroup.displayOptions;
@@ -385,10 +338,6 @@ var _private_ = {
         return geometry;
     },
 
-    /*
-     * Function: updateEdgeGroupGeometryArrows
-     * (*INTERNAL*)
-     */
     updateEdgeGroupGeometryArrows:
     function updateEdgeGroupGeometryArrows(self, edgeGroup, cacheEntry) {
         /* TODO(opadron) implement arrows */
@@ -401,10 +350,6 @@ var _private_ = {
         );
     },
 
-    /*
-     * Function: updateEdgeGroupGeometry
-     * (*INTERNAL*)
-     */
     updateEdgeGroupGeometry:
     function updateEdgeGroupGeometry(self, groupName) {
         var cacheEntry = self.getEdgeGroupCache(groupName);
@@ -427,10 +372,6 @@ var _private_ = {
         delete cacheEntry.actor;
     },
 
-    /*
-     * Function: updateEdgeGroupMaterialLines
-     * (*INTERNAL*)
-     */
     updateEdgeGroupMaterialLines:
     function updateEdgeGroupMaterialLines(self, edgeGroup, cacheEntry) {
         var displayOptions = edgeGroup.displayOptions;
@@ -450,10 +391,6 @@ var _private_ = {
         return material;
     },
 
-    /*
-     * Function: updateEdgeGroupMaterialCylinders
-     * (*INTERNAL*)
-     */
     updateEdgeGroupMaterialCylinders:
     function updateEdgeGroupMaterialCylinders(self, edgeGroup, cacheEntry) {
         var displayOptions = edgeGroup.displayOptions;
@@ -474,10 +411,6 @@ var _private_ = {
         return material;
     },
 
-    /*
-     * Function: updateEdgeGroupMaterialArrows
-     * (*INTERNAL*)
-     */
     updateEdgeGroupMaterialArrows:
     function updateEdgeGroupMaterialArrows(self, edgeGroup, cacheEntry) {
         /* TODO(opadron) implement arrows */
@@ -490,10 +423,6 @@ var _private_ = {
         );
     },
 
-    /*
-     * Function: updateEdgeGroupMaterial
-     * (*INTERNAL*)
-     */
     updateEdgeGroupMaterial:
     function updateEdgeGroupMaterial(self, groupName) {
         var cacheEntry = self.getEdgeGroupCache(groupName);
@@ -516,10 +445,6 @@ var _private_ = {
         delete cacheEntry.actor;
     },
 
-    /*
-     * Function: updateEdgeGroupActorLines
-     * (*INTERNAL*)
-     */
     updateEdgeGroupActorLines:
     function updateEdgeGroupActorLines(self, edgeGroup, cacheEntry) {
         var lineType = threejs.LinePieces;
@@ -536,10 +461,6 @@ var _private_ = {
         return actor;
     },
 
-    /*
-     * Function: updateEdgeGroupActorCylinders
-     * (*INTERNAL*)
-     */
     updateEdgeGroupActorCylinders:
     function updateEdgeGroupActorCylinders(self, edgeGroup, cacheEntry) {
         var actor = new threejs.Mesh(
@@ -550,10 +471,6 @@ var _private_ = {
         return actor;
     },
 
-    /*
-     * Function: updateEdgeGroupActorArrows
-     * (*INTERNAL*)
-     */
     updateEdgeGroupActorArrows:
     function updateEdgeGroupActorArrows(self, edgeGroup, cacheEntry) {
         /* TODO(opadron) implement arrows */
@@ -566,10 +483,6 @@ var _private_ = {
         );
     },
 
-    /*
-     * Function: updateEdgeGroupActor
-     * (*INTERNAL*)
-     */
     updateEdgeGroupActor:
     function updateEdgeGroupActor(self, groupName) {
         var cacheEntry = self.getEdgeGroupCache(groupName);

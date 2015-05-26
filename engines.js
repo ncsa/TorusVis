@@ -1,9 +1,6 @@
 
-/**
- * @defgroup torusvis_engines engines
- * @brief output engine specification and implementations
- * @ingroup torusvis
- */
+/** @file */
+
 module.exports = {
     AbstractOutputEngine         : require("./engines/AbstractOutputEngine"),
     GenericOutputEngine          : require("./engines/GenericOutputEngine" ),

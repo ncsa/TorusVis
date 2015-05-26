@@ -1,77 +1,86 @@
 
-/*
- * File: GenericGroups
- *
- * node and edge groups
- */
+/** @file */
 
 "use strict";
 
 var utils = require("../misc/utils");
 
-/*
- * About: Common Display Options
+/**
+ * @class GenericGroup
+ * @brief common base class for node and edge groups
  *
- * Parameters:
- *     map - (*Object*) texture map to use. 
+ * @details A @ref GenericGroup is a set of handles indexed by their handle ID
+ * numbers.  @ref GenericGroup "GenericGroups" form the base class for @ref
+ * NodeGroup "NodeGroups" and @ref EdgeGroup "EdgeGroups", where each instance
+ * is bundled with display information.
  *
- *     size - (*Number*) size of the elements used (e.g. radius of spheres,
- *            height of sprites, thickness of lines)
+ * @private
  *
- *     opacity - (*Number*) value between 0.0 (fully transparent) and 1.0 (fully
- *               opaque)
+ * @sa @ref NodeGroup
+ * @sa @ref EdgeGroup
+ * @sa @ref handles
  *
- *     color - (*Number*) color in hex of the elements used (ignored if
- *             colorBy and colorMap are set
- *
- *     colorBy - (*String*) attribute name from nodes' or edges' data objects by
- *               which the elements used should be colored
- *
- *     colorMap - (*<ColorMap>*) color mapping from fetched colorBy values to
- *                colors
- *
- * See also:
- *      - <THREE.ImageUtils.loadTexture at
- *          http://threejs.org/docs/#Reference/Extras/ImageUtils.loadTexture>
- *
+ * @ingroup torusvis_groups
  */
 
-/*
- * Class: GenericGroup
+/**
+ * @page CommonDisplayOptions Common Display Options
  *
- * (*INTERNAL*) common subclass for node and edge groups
+ * @code{.cpp}
+ * Object options;
+ * @endcode
  *
- * A <GenericGroup> is a set of handles index by their handle ID numbers.
- * <GenericGroups> form the basis of <NodeGroups> and <EdgeGroups>, which are
- * subclasses of <GenericGroup> with each instance bundled with display
- * information.
+ * @brief common display options for groups
  *
- * See also:
- *      - <NodeGroup>
- *      - <EdgeGroup>
- *      - <handles>
+ * @details common display options for groups.  These options are only those
+ * more commonly recognized by various implementations of
+ * @ref AbstractOutputEngine.
+ *
+ * @param options.size       (```Number```) size of the elements used (e.g.
+ *                           radius of spheres, height of sprites, thickness of
+ *                           lines)
+ *
+ * @param options.opacity    (```Number```) value between 0.0 (fully
+ *                           transparent) and 1.0 (fully opaque)
+ *
+ * @param options.color      (```Number```) color in hex of the elements used
+ *                           (ignored if colorBy and colorMap are set)
+ *
+ * @param options.colorBy    (```String```) attribute name from nodes' or edges'
+ *                           data objects by which the elements used should be
+ *                           colored
+ *
+ * @param options.colorMap   (@ref ColorMap) color mapping from fetched colorBy
+ *                           values to colors
+ *
+ * @param options.map        (```Object```) texture map to use
+ *
+ * @note the options documented in this entry are not meant to be exhaustive.
+ * Recognized display options are defined by the @ref AbstractOutputEngine
+ * implementation used.  For more display options, see the documentation for
+ * your chosen implementation.
+ *
+ * @sa [THREE.ImageUtils.loadTexture](                                     \
+ *     http://threejs.org/docs/#Reference/Extras/ImageUtils.loadTexture>)
  */
 
-/*
- * Constructor: constructor
- *
- * constructs a new <GenericGroup>
- *
- * Parameters:
- *     handleList - (*Array*) initial list of handles to populate this
- *                  <GenericGroup> with
- *
- *     options - (*Object*) table of options
- *
- * See also:
- *      - <Common Display Options>
- */
-function constructor(handleList, options) {
-    /* documentation stub */
-}
 
+/**
+ * @fn GenericGroup(Array<handle> handleList = [], Object options = {})
+ * @brief constructs a new @ref GenericGroup
+ *
+ * @param[in] handleList initial list of handles to populate this
+ *                       @ref GenericGroup with
+ *
+ * @param[in] options    set of options
+ *
+ * @sa @ref CommonDisplayOptions
+ *
+ * @memberof GenericGroup
+ */
 function GenericGroup(handleList, options) {
     handleList = handleList || [];
+    options = options || {};
     this.handleIdSet = {};
     this.iterGuard = new utils.IterationGuard();
     this.iterGuard.setException(
@@ -90,45 +99,40 @@ function GenericGroup(handleList, options) {
 utils.extend(GenericGroup.prototype, {
     constructor: GenericGroup,
 
-    hasItem:
-    /*
-     * Method: hasItem
+    /**
+     * @fn Boolean hasItem(Object handle)
+     * @brief determine if this @ref GenericGroup has the given item
      *
-     * determine if this <GenericGroup> has the given item
+     * @param[in] handle handle to the given item
      *
-     * Parameters:
-     *     handle - (*Object*) handle to the given item
+     * @return whether this @ref GenericGroup has the given item
      *
-     * Returns:
-     *      - (*Boolean*) whether this <GenericGroup> has the given item
+     * @sa @ref addItem
+     * @sa @ref removeItem
      *
-     * See also:
-     *      - <addItem>
-     *      - <removeItem>
+     * @memberof GenericGroup
      */
+    hasItem:
     function hasItem(handle) {
         return (this.handleIdSet[handle] === handle);
     },
 
-    addItem:
-    /*
-     * Method: addItem
+    /**
+     * @fn GenericGroup addItem(Object handle)
+     * @brief add a new item to this @ref GenericGroup
      *
-     * add a new item to this <GenericGroup>
+     * @param[in] handle handle to the new item
      *
-     * Parameters:
-     *     handle - (*Object*) handle to the new item
+     * @return ```this```
      *
-     * Returns:
-     *      - (*Object*) *this*
+     * @throw Error if called while iterating
      *
-     * Throws:
-     *      - (*Error*) if called while iterating
+     * @sa @ref removeItem
+     * @sa @ref iterItems
      *
-     * See also:
-     *      - <removeItem>
-     *      - <iterItems>
+     * @memberof GenericGroup
      */
+    addItem:
     function addItem(handle) {
         this.iterGuard.check();
         if(!this.hasItem(handle)) {
@@ -138,52 +142,57 @@ utils.extend(GenericGroup.prototype, {
         return this;
     },
 
-    iterItems:
-    /*
-     * Method: iterItems
+    /**
+     * @fn void iterItems(Function callback)
+     * @brief iterate over each item in this @ref GenericGroup
      *
-     * iterate over each item in this <GenericGroup>
+     * @details iterates over each item in this @ref GenericGroup.
+     * ```callback``` must conform to the following signature:
+     * @code{.cpp}
+     *     Boolean callback(Object, String, GenericGroup)
+     * @endcode
+     * For each handle in this @ref GenericGroup, ```callback``` is called with
+     * the handle, ```null```, and ```this```, respectively.  If ```callback```
+     * returns ```true```, then the iteration ends early.
      *
-     * Parameters:
-     *     callback - (*Function*) callback function to call for each item
+     * @param[in] callback callback function to call for each item
      *
-     * Throws:
-     *      - (*Error*) if the iterating code attempts to add or remove items
-     *        from this <GenericGroup>
+     * @throw Error if the iterating code attempts to add or remove items from
+     *              this @ref GenericGroup
      *
-     * See also:
-     *      - <addItem>
-     *      - <removeItem>
+     * @sa @ref addItem
+     * @sa @ref removeItem
+     *
+     * @memberof GenericGroup
      */
+    iterItems:
     function iterItems(callback) {
         var self = this;
         this.iterGuard.run(function() {
             Object.keys(self.handleIdSet).some(function(key) {
                 var handle = self.handleIdSet[key];
-                return callback(handle);
+                return callback(handle, null, self);
             });
         });
     },
 
-    removeItem:
-    /*
-     * Method: removeItem
+    /**
+     * @fn GenericGroup removeItem(Object handle)
+     * @brief remove the given item from this @ref GenericGroup
      *
-     * remove the given item from this <GenericGroup>
+     * @param[in] handle handle to the given item
      *
-     * Parameters:
-     *     handle - (*Object*) handle to the given item
+     * @return ```this```
      *
-     * Returns:
-     *      - (*Object*) *this*
+     * @throw Error if called while iterating
+     * @throw Error if ```handle``` not in this @ref GenericGroup
      *
-     * Throws:
-     *      - (*Error*) if called while iterating
+     * @sa @ref addItem
+     * @sa @ref iterItems
      *
-     * See also:
-     *      - <addItem>
-     *      - <iterItems>
+     * @memberof GenericGroup
      */
+    removeItem:
     function removeItem(handle) {
         this.iterGuard.check();
         if(!this.hasItem(handle)) {

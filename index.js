@@ -1,8 +1,5 @@
 
-/**
- * @defgroup torusvis torusvis
- * @brief the main library!
- */
+/** @file */
 
 module.exports = {
     colors  : require("./colors" ),

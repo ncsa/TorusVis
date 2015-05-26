@@ -1,9 +1,6 @@
 
-/**
- * @defgroup torusvis_groups groups
- * @brief node and edge groups
- * @ingroup torusvis
- */
+/** @file */
+
 module.exports = {
     EdgeGroup    : require("./groups/EdgeGroup"   ),
     GenericGroup : require("./groups/GenericGroup"),

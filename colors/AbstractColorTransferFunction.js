@@ -1,4 +1,6 @@
 
+/** @file */
+
 /**
  * @class AbstractColorTransferFunction
  * @brief color transfer function foundation class
@@ -147,10 +149,10 @@ utils.extend(AbstractColorTransferFunction.prototype, {
      *
      * @return the mode for overflow values
      *
-     * @sq @ref getOverflowColor
-     * @sq @ref getUnderflowColor
-     * @sq @ref getUnderflowMode
-     * @sq @ref computeColor
+     * @sa @ref getOverflowColor
+     * @sa @ref getUnderflowColor
+     * @sa @ref getUnderflowMode
+     * @sa @ref computeColor
      *
      * @memberof AbstractColorTransferFunction
      */

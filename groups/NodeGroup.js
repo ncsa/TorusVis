@@ -1,156 +1,71 @@
 
-/*
- * File: NodeGroups
- *
- * node groups
- */
+/** @file */
 
 "use strict";
 
 var utils = require("../misc/utils");
 var GenericGroup = require("./GenericGroup");
 
-/*
- * Class: NodeGroup
+/**
+ * @class NodeGroup
+ * @brief collection of nodes with a set of display options
  *
- * collection of nodes with a set of display options
+ * @extends GenericGroup
  *
- * Extends:
- *      - <GenericGroup>
+ * @sa @ref EdgeGroup
  *
- * See also:
- *      - <EdgeGroup>
+ * @ingroup torusvis_groups
  */
 
-/*
- * Constructor: constructor
+/**
+ * @fn NodeGroup(Object options = {})
+ * @brief construct a new @ref NodeGroup
  *
- * construct a new <NodeGroup>
+ * @param[in] options.nodes           (```Array<Object>```) collection of node
+ *                                    handles to be added to this @ref NodeGroup
  *
- * Parameters:
- *     args - (*Object*) table of group arguments
- *     args.nodes - (*Array*) collection of node handles to be added to this
- *                  <NodeGroup>
- *     args.displayMode - (*String*) mode indicating how the nodes should be
- *                        displayed
- *     args.displayOptions - (*Object*) options controlling how the nodes should
- *                           be displayed
+ * @param[in] options.displayMode     (```String```) mode indicating how the
+ *                                    nodes should be displayed
  *
- * See also:
- *      - <Common Display Options>
+ * @param[in] options.displayOptions  (```Object```) options controlling how the
+ *                                    nodes should be displayed
+ *
+ * @sa @ref CommonDisplayOptions
+ *
+ * @memberof NodeGroup
  */
-function constructor(args) {
-    /* documentation stub */
-}
+function NodeGroup(options) {
+    options = options || {};
 
-function NodeGroup(args_) {
-    args_ = args_ || {};
-
-    var args = {};
-    utils.extend(true, args,
-        NodeGroup.DEFAULT_ARGS,
-        args_
+    var newOptions = {};
+    utils.extend(true, newOptions,
+        { displayMode: "sphere", displayOptions: {} },
+        options
     );
 
-    this.setDisplayMode(args.displayMode);
-    var nodes = utils.objectPop(args, "nodes")[1];
-    GenericGroup.apply(this, [nodes, args]);
+    this.setDisplayMode(newOptions.displayMode);
+    var nodes = utils.objectPop(newOptions, "nodes")[1];
+    GenericGroup.apply(this, [nodes, newOptions]);
 }
-
-
-utils.extend(NodeGroup, {
-    /*
-     * Variable: DEFAULT_DISPLAY_OPTIONS
-     *
-     * (*Object*) default display options for new <NodeGroups> by display mode
-     *
-     * Parameters:
-     *     sphere.thetaSegments - (*Number*)
-     *     sphere.thetaStart - (*Number*)
-     *     sphere.thetaLength - (*Number*)
-     *     sphere.phiSegments - (*Number*)
-     *     sphere.phiStart - (*Number*)
-     *     sphere.phiLength - (*Number*)
-     *
-     * Parameters:
-     *     "--common--".color - (*Number*)
-     *     "--common--".size - (*Number*)
-     *     "--common--".opacity - (*Number*)
-     *
-     * See also:
-     *      - <NODE_GROUP_DEFAULT_ARGS>
-     *      - <EDGE_GROUP_DEFAULT_DISPLAY_OPTIONS>
-     *      - <Common Display Options>
-     */
-    DEFAULT_DISPLAY_OPTIONS: {
-        sphere: {
-            thetaSegments  :           3,
-            thetaStart     :           0,
-            thetaLength    :     Math.PI,
-
-            phiSegments    :           2,
-            phiStart       :           0,
-            phiLength      : 2.0*Math.PI
-        },
-
-        "--common--": {
-            color  : 0xFFFFFF,
-            size   : 1,
-            opacity: 1.0
-        }
-    },
-
-    /*
-     * Variable: DEFAULT_ARGS
-     *
-     * (*Object*) default arguments for new <NodeGroups>
-     *
-     * Parameters:
-     *     nodes - (*Array*)
-     *     displayMode - (*String*)
-     *     displayOptions - (*Object*)
-     *
-     * See also:
-     *      - <NODE_GROUP_DEFAULT_DISPLAY_OPTIONS>
-     *      - <EDGE_GROUP_DEFAULT_ARGS>
-     */
-    DEFAULT_ARGS: {
-        nodes: [],
-        displayMode: "sprite",
-        displayOptions: { }
-    }
-});
 
 utils.extend(NodeGroup.prototype, GenericGroup.prototype);
 utils.extend(NodeGroup.prototype, {
     constructor: NodeGroup,
 
-    setDisplayMode:
-    /*
-     * Method: setDisplayMode
+    /**
+     * @fn NodeGroup setDisplayMode(String mode)
+     * @brief set this @ref NodeGroup "NodeGroup's" display mode
      *
-     * set this <NodeGroup's> display mode
+     * @param[in] mode the mode to set this @ref NodeGroup "NodeGroup's" display
+     *                 mode to
      *
-     * Parameters:
-     *     mode - (*String*) the mode to set this <NodeGroup's> display mode to
+     * @return ```this```
      *
-     * Returns:
-     *      - (*Object*) *this*
+     * @memberof NodeGroup
      */
+    setDisplayMode:
     function setDisplayMode(mode) {
         this.displayMode = mode;
-
-        var newDisplayOptionSet = utils.extend(true, {},
-            NodeGroup.DEFAULT_DISPLAY_OPTIONS["--common--"],
-            NodeGroup.DEFAULT_DISPLAY_OPTIONS[mode]
-        );
-
-        this.displayOptions = utils.extend(
-            true,
-            newDisplayOptionSet,
-            this.displayOptions
-        );
-
         return this;
     }
 });

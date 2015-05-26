@@ -1,11 +1,9 @@
 
-/*
- * File: ThreeJSSceneNodeOutputEngine
+/**
+ * @file
+ * @brief output engine implementation producing a threejs scene node
  *
- * output engine implementation producing a threejs scene node
- *
- * See also:
- *      - <threejs>
+ * @sa @ref torusvis_misc.features.threejs
  */
 
 "use strict";
@@ -22,23 +20,26 @@ function _checkForThreeJS_() {
     if(!threejs) { throw Error("no three.js library detected"); }
 }
 
-/*
- * Class: ThreeJSSceneNodeOutputEngine
+/**
+ * @class ThreeJSSceneNodeOutputEngine
+ * @brief output engine producing a threejs scene node
  *
- * output engine producing a threejs scene node
+ * @extends GenericOutputEngine
  *
- * Extends:
- *      - <GenericOutputEngine>
+ * @sa @ref ThreeJSOutputEngine
  *
- * See also:
- *      - <ThreeJSOutputEngine>
+ * @ingroup torusvis_engines
  */
 
-/*
- * Constructor: constructor
+/**
+ * @fn ThreeJSSceneNodeOutputEngine(     \
+ *         AbstractGraph graph,          \
+ *         AbstractTopologyMapper mapper \
+ *     )
  *
- * Extends:
- *      - <GenericOutputEngine.constructor>
+ * @implements GenericOutputEngine
+ *
+ * @memberof ThreeJSSceneNodeOutputEngine
  */
 function ThreeJSSceneNodeOutputEngine(graph, mapper) {
     _checkForThreeJS_();
@@ -54,11 +55,12 @@ utils.extend(
 utils.extend(ThreeJSSceneNodeOutputEngine.prototype, {
     constructor: ThreeJSSceneNodeOutputEngine,
 
-    /*
-     * Method: clearNodeGroupCache
+    /**
+     * @fn ThreeJSSceneNodeOutputEngine clearNodeGroupCache(String groupName)
      *
-     * Implements:
-     *      - <AbstractOutputEngine.clearNodeGroupCache>
+     * @implements GenericOutputEngine
+     *
+     * @memberof ThreeJSSceneNodeOutputEngine
      */
     clearNodeGroupCache:
     function clearNodeGroupCache(groupName) {
@@ -75,11 +77,12 @@ utils.extend(ThreeJSSceneNodeOutputEngine.prototype, {
         );
     },
 
-    /*
-     * Method: clearEdgeGroupCache
+    /**
+     * @fn ThreeJSSceneNodeOutputEngine clearEdgeGroupCache(String groupName)
      *
-     * Implements:
-     *      - <AbstractOutputEngine.clearEdgeGroupCache>
+     * @implements GenericOutputEngine
+     *
+     * @memberof ThreeJSSceneNodeOutputEngine
      */
     clearEdgeGroupCache:
     function clearEdgeGroupCache(groupName) {
@@ -96,14 +99,12 @@ utils.extend(ThreeJSSceneNodeOutputEngine.prototype, {
         );
     },
 
-    /*
-     * Method: updateNodeGroup
+    /**
+     * @fn ThreeJSSceneNodeOutputEngine updateNodeGroup(String groupName)
      *
-     * Implements:
-     *      - <AbstractOutputEngine.updateNodeGroup>
+     * @implements GenericOutputEngine
      *
-     * See also:
-     *      - <updateEdgeGroup>
+     * @memberof ThreeJSSceneNodeOutputEngine
      */
     updateNodeGroup:
     function updateNodeGroup(groupName) {
@@ -113,16 +114,14 @@ utils.extend(ThreeJSSceneNodeOutputEngine.prototype, {
         return this;
     },
 
-    updateEdgeGroup:
-    /*
-     * Method: updateEdgeGroup
+    /**
+     * @fn ThreeJSSceneNodeOutputEngine updateEdgeGroup(String groupName)
      *
-     * Implements:
-     *      - <AbstractOutputEngine.updateEdgeGroup>
+     * @implements GenericOutputEngine
      *
-     * See also:
-     *      - <updateNodeGroup>
+     * @memberof ThreeJSSceneNodeOutputEngine
      */
+    updateEdgeGroup:
     function updateEdgeGroup(groupName) {
         _private_.updateEdgeGroupGeometry(this, groupName);
         _private_.updateEdgeGroupMaterial(this, groupName);

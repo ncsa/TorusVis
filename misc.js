@@ -1,9 +1,5 @@
 
-/**
- * @defgroup torusvis_misc misc
- * @brief miscellaneous utilities
- * @ingroup torusvis
- */
+/** @file */
 
 module.exports = {
     detector : require("./misc/detector"),

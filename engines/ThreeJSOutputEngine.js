@@ -1,12 +1,10 @@
 
-/*
- * File: ThreeJSOutputEngine
+/**
+ * @file
+ * @brief high-level output engine implementation producing a complete DOM
+ *        element containing a threejs scene
  *
- * high-level output engine implementation producing a complete DOM element
- * containing a threejs scene
- *
- * See also:
- *      - <threejs>
+ * @sa @ref torusvis_misc.features.threejs
  */
 
 "use strict";
@@ -19,21 +17,6 @@ var threejs = features.get("threejs");
 var threejsRenderer = features.get("threejsRenderer");
 var noWebGLWarningBanner = features.require("noWebGLWarningBanner");
 var globals = features.get("global");
-
-/*
- * Function: _ThreeJSOutputEngineAddLights_
- *
- * (*INTERNAL*) adds a set of predefined lights to a <ThreeJSOutputEngine>'s
- * scene
- *
- * Parameters:
- *
- *     self - (*Object*) the <ThreeJSOutputEngine> to add lights to
- *
- * See also:
- *
- *      - <ThreeJSOutputEngine.constructor>
- */
 
 function _ThreeJSOutputEngineAddLights_(self) {
     var out = self.getOutput();
@@ -54,20 +37,6 @@ function _ThreeJSOutputEngineAddLights_(self) {
     out.scene.add(lights[2]);
 }
 
-/*
- * Function: _ThreeJSOutputEngineAddCamera_
- *
- * (*INTERNAL*) adds a camera at a predefined location to a
- *              <ThreeJSOutputEngine>'s scene
- *
- * Parameters:
- *
- *     self - (*Object*) the <ThreeJSOutputEngine> to add the camera to
- *
- * See also:
- *
- *      - <ThreeJSOutputEngine.constructor>
- */
 function _ThreeJSOutputEngineAddCamera_(self) {
     var out = self.getOutput();
 
@@ -85,19 +54,6 @@ function _ThreeJSOutputEngineAddCamera_(self) {
     out.scene.add(out.axesCamera);
 }
 
-/*
- * Function: _ThreeJSOutputEngineAddRenderer_
- *
- * (*INTERNAL*) adds a predefined renderer to a <ThreeJSOutputEngine>
- *
- * Parameters:
- *
- *     self - (*Object*) the <ThreeJSOutputEngine> to add the renderer to
- *
- * See also:
- *
- *      - <ThreeJSOutputEngine.constructor>
- */
 function _ThreeJSOutputEngineAddRenderer_(self) {
     var out = self.getOutput();
 
@@ -123,20 +79,6 @@ function _ThreeJSOutputEngineAddRenderer_(self) {
     out.container.appendChild(out.renderer.domElement);
 }
 
-
-/*
- * Function: _ThreeJSOutputEngineAddControls_
- *
- * (*INTERNAL*) adds predefined camera controls to a <ThreeJSOutputEngine>
- *
- * Parameters:
- *
- *     self - (*Object*) the <ThreeJSOutputEngine> to add the camera controls to
- *
- * See also:
- *
- *      - <ThreeJSOutputEngine.constructor>
- */
 function _ThreeJSOutputEngineAddControls_(self) {
     var out = self.getOutput();
 
@@ -160,19 +102,6 @@ function _ThreeJSOutputEngineAddControls_(self) {
     });
 }
 
-/*
- * Function: _ThreeJSOutputEngineAddAxes_
- *
- * (*INTERNAL*) adds predefined set of axis objects to a <ThreeJSOutputEngine>
- *
- * Parameters:
- *
- *     self - (*Object*) the <ThreeJSOutputEngine> to add the axis objects to
- *
- * See also:
- *
- *      - <ThreeJSOutputEngine.constructor>
- */
 function _ThreeJSOutputEngineAddAxes_(self) {
     var out = self.getOutput();
 
@@ -200,29 +129,28 @@ function _ThreeJSOutputEngineAddAxes_(self) {
     out.axes = axes;
 }
 
-
-/*
- * Class: ThreeJSOutputEngine
+/**
+ * @class ThreeJSOutputEngine
+ * @brief output engine producing a complete DOM element containing a threejs
+ *        scene
  *
- * output engine producing a complete DOM element containing a threejs scene
+ * @details @ref ThreeJSOutputEngine "ThreeJSOutputEngines" produce complete DOM
+ * elements which contain threejs scenes, including cameras, lights, mouse and
+ * keyboard event listeners, and automatic WebGL support detection mechanisms.
  *
- * <ThreeJSOutputEngines> produce complete DOM elements which contain threejs
- * scenes, including cameras, lights, mouse and keyboard event listeners, and
- * automatic WebGL support detection mechanisms.
+ * @extends ThreeJSSceneNodeOutputEngine
  *
- * Extends:
- *      - <ThreeJSSceneNodeOutputEngine>
+ * @ingroup torusvis_engines
  */
 
-/*
- * Constructor: constructor
+/**
+ * @fn ThreeJSOutputEngine(AbstractGraph graph, AbstractTopologyMapper mapper)
  *
- * construct a new <ThreeJSOutputEngine>
+ * @implements ThreeJSSceneNodeOutputEngine
  *
- * Extends:
- *      - <ThreeJSSceneNodeOutputEngine.constructor>
+ * @memberof ThreeJSOutputEngine
  */
-function ThreeJSOutputEngine() {
+function ThreeJSOutputEngine(graph, mapper) {
     ThreeJSSceneNodeOutputEngine.apply(this, arguments);
 
     var out = this.getOutput();
@@ -249,47 +177,46 @@ utils.extend(
 utils.extend(ThreeJSOutputEngine.prototype, {
     constructor: ThreeJSOutputEngine,
 
-    setContainerSize:
-    /*
-     * Method: setContainerSize
+    /**
+     * @fn ThreeJSOutputEngine setContainerSize(Number width, Number height)
+     * @brief set the size of the dom element containing this
+     *        @ref ThreeJSOutputEngine "ThreeJSOutputEngine's" scene
      *
-     * set the size of the dom element containing this <ThreeJSOutputEngine's>
-     * scene
+     * @param[in] width dom element width
+     * @param[in] height dom element height
      *
-     * Parameters:
-     *     w - (*Number*) dom element width
-     *     h - (*Number*) dom element height
+     * @return ```this```
      *
-     * Returns:
-     *      - (*<ThreeJSOutputEngine>*) *this*
+     * @sa @ref render
+     * @sa @ref update
      *
-     * See also:
-     *      - <render>
-     *      - <update>
+     * @memberof ThreeJSOutputEngine
      */
-    function setContainerSize(w, h) {
+    setContainerSize:
+    function setContainerSize(width, height) {
         var out = this.getOutput();
 
-        out.renderer.setSize(w, h);
-        out.camera.aspect = w/h;
+        out.renderer.setSize(width, height);
+        out.camera.aspect = width/height;
         out.camera.updateProjectionMatrix();
 
         return this;
     },
 
-    render:
-    /*
-     * Method: render
+    /**
+     * @fn ThreeJSOutputEngine render()
      *
-     * convenience method that renders this <ThreeJSOutputEngine's> scene using
-     * the produced renderer and canvas objects
+     * @brief convenience method that renders this
+     *        @ref ThreeJSOutputEngine "ThreeJSOutputEngine's" scene using the
+     *        produced renderer and canvas objects
      *
-     * Returns:
-     *      - (*<ThreeJSOutputEngine>*) *this*
+     * @return ```this```
      *
-     * See also:
-     *      - <update>
+     * @sa @ref update
+     *
+     * @memberof ThreeJSOutputEngine
      */
+    render:
     function render() {
         var out = this.getOutput();
 
@@ -302,13 +229,14 @@ utils.extend(ThreeJSOutputEngine.prototype, {
         return this;
     },
 
-    update:
-    /*
-     * Method: update
+    /**
+     * @fn ThreeJSOutputEngine update()
      *
-     * Extends:
-     *      - <GenericOutputEngine.update>
+     * @implements ThreeJSSceneNodeOutputEngine
+     *
+     * @memberof ThreeJSOutputEngine
      */
+    update:
     function update() {
         var out = this.getOutput();
 
@@ -318,13 +246,14 @@ utils.extend(ThreeJSOutputEngine.prototype, {
         return this;
     },
 
-    onControlChange:
-    /*
-     * Method: onControlChange
+    /**
+     * @fn void onControlChange()
+     * @brief event handler that is callsed after panning, zooming, or rotating
+     *        the view
      *
-     * event handler that is callsed after panning, zooming, or rotating the
-     * view
+     * @memberof ThreeJSOutputEngine
      */
+    onControlChange:
     function onControlChange() {
         var out = this.getOutput();
 

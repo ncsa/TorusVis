@@ -1,8 +1,8 @@
 
-/*
- * File: GenericOutputEngine
- *
- * generic output engine implementation including common method implementations
+/**
+ * @file
+ * @brief generic output engine implementation including common method
+ *        implementations
  */
 
 "use strict";
@@ -66,27 +66,26 @@ function _pageCaches_(self) {
     utils.extend(true, oCache, _ensureCaches_(self));
 }
 
-/*
- * Class: GenericOutputEngine
+/**
+ * @class GenericOutputEngine
+ * @brief generic output engine implementing common methods
  *
- * generic output engine implementing common methods
+ * @extends AbstractOutputEngine
  *
- * Extends:
- *      - <AbstractOutputEngine>
+ * @ingroup torusvis_engines
  */
 
-/*
- * Constructor: constructor
+/**
+ * @fn GenericOutputEngine(              \
+ *         AbstractGraph graph,          \
+ *         AbstractTopologyMapper mapper \
+ *     )
+ * @brief construct a new @ref GenericOutputEngine
  *
- * construct a new <GenericOutputEngine>
+ * @param[in] graph the graph to produce output for
+ * @param[in] mapper the topology mapper used to map the given graph
  *
- * constructs a new <GenericOutputEngine>.  If <NodeGroups> or <EdgeGroups> are
- * provided, the constructed output engine is prepopulated with the node and
- * edge groups contained within them.
- *
- * Parameters:
- *     graph - the graph to produce output for
- *     mapper - the topology mapper used to map the given graph
+ * @memberof GenericOutputEngine
  */
 function GenericOutputEngine(graph, mapper) {
     this.graph = graph;
@@ -113,24 +112,24 @@ utils.extend(GenericOutputEngine.prototype, AbstractOutputEngine.prototype);
 utils.extend(GenericOutputEngine.prototype, {
     constructor: GenericOutputEngine,
 
-    getNodeGroup:
-    /*
-     * Method: getNodeGroup
+    /**
+     * @fn NodeGroup getNodeGroup(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.getNodeGroup>
+     * @memberof GenericOutputEngine
      */
+    getNodeGroup:
     function getNodeGroup(groupName) {
         return this.nodeGroups[groupName];
     },
 
-    setNodeGroup:
-    /*
-     * Method: setNodeGroup
+    /**
+     * @fn GenericOutputEngine setNodeGroup(String groupName, NodeGroup group)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.setNodeGroup>
+     * @memberof GenericOutputEngine
      */
+    setNodeGroup:
     function setNodeGroup(groupName, group) {
         if(arguments.length < 2) {
             var groups = groupName;
@@ -154,11 +153,11 @@ utils.extend(GenericOutputEngine.prototype, {
         return this;
     },
 
-    /*
-     * Method: removeNodeGroup
+    /**
+     * @fn: GenericOutputEngine removeNodeGroup(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.removeNodeGroup>
+     * @memberof GenericOutputEngine
      */
     removeNodeGroup:
     function removeNodeGroup(groupName) {
@@ -168,24 +167,24 @@ utils.extend(GenericOutputEngine.prototype, {
         return this;
     },
 
-    getEdgeGroup:
-    /*
-     * Method: getEdgeGroup
+    /**
+     * @fn EdgeGroup getEdgeGroup(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.getEdgeGroup>
+     * @memberof GenericOutputEngine
      */
+    getEdgeGroup:
     function getEdgeGroup(groupName) {
         return this.edgeGroups[groupName];
     },
 
-    setEdgeGroup:
-    /*
-     * Method: setEdgeGroup
+    /**
+     * @fn GenericOutputEngine setEdgeGroup(String groupName, EdgeGroup group)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.setEdgeGroup>
+     * @memberof GenericOutputEngine
      */
+    setEdgeGroup:
     function setEdgeGroup(groupName, group) {
         if(arguments.length < 2) {
             var groups = groupName;
@@ -209,11 +208,11 @@ utils.extend(GenericOutputEngine.prototype, {
         return this;
     },
 
-    /*
-     * Method: removeEdgeGroup
+    /**
+     * @fn GenericOutputEngine removeEdgeGroup(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.removeEdgeGroup>
+     * @memberof GenericOutputEngine
      */
     removeEdgeGroup:
     function removeEdgeGroup(groupName) {
@@ -223,57 +222,57 @@ utils.extend(GenericOutputEngine.prototype, {
         return this;
     },
 
-    update:
-    /*
-     * Method: update
+    /**
+     * @fn GenericOutputEngine update()
+     * @implements AbstractOutputEngine
      *
-     * Extends:
-     *      - <AbstractOutputEngine.update>
+     * @memberof GenericOutputEngine
      */
+    update:
     function update() {
         _pageCaches_(this);
         AbstractOutputEngine.prototype.update.apply(this, arguments);
         return this;
     },
 
-    getOutput:
-    /*
-     * Method: getOutput
+    /**
+     * @fn Object getOutput()
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.getOutput>
+     * @memberof GenericOutputEngine
      */
+    getOutput:
     function getOutput() {
         return this.output;
     },
 
-    /*
-     * Method: getNodeGroupCache
+    /**
+     * @fn Object getNodeGroupCache(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.getNodeGroupCache>
+     * @memberof GenericOutputEngine
      */
     getNodeGroupCache:
     function getNodeGroupCache(groupName) {
         return _ensureNodeCache_(this, groupName);
     },
 
-    /*
-     * Method: getOldNodeGroupCache
+    /**
+     * @fn Object getOldNodeGroupCache(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.getOldNodeGroupCache>
+     * @memberof GenericOutputEngine
      */
     getOldNodeGroupCache:
     function getOldNodeGroupCache(groupName) {
         return _ensureOldNodeCache_(this, groupName);
     },
 
-    /*
-     * Method: clearNodeGroupCache
+    /**
+     * @fn GenericOutputEngine clearNodeGroupCache(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.clearNodeGroupCache>
+     * @memberof GenericOutputEngine
      */
     clearNodeGroupCache:
     function clearNodeGroupCache(groupName) {
@@ -292,34 +291,33 @@ utils.extend(GenericOutputEngine.prototype, {
         return this;
     },
 
-    /*
-     * Method: getEdgeGroupCache
+    /**
+     * @fn Object getEdgeGroupCache(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *
-     *      - <AbstractOutputEngine.getEdgeGroupCache>
+     * @memberof GenericOutputEngine
      */
     getEdgeGroupCache:
     function getEdgeGroupCache(groupName) {
         return _ensureEdgeCache_(this, groupName);
     },
 
-    /*
-     * Method: getOldEdgeGroupCache
+    /**
+     * @fn Object getOldEdgeGroupCache(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.getOldEdgeGroupCache>
+     * @memberof GenericOutputEngine
      */
     getOldEdgeGroupCache:
     function getOldEdgeGroupCache(groupName) {
         return _ensureOldEdgeCache_(this, groupName);
     },
 
-    /*
-     * Method: clearEdgeGroupCache
+    /**
+     * @fn GenericOutputEngine clearEdgeGroupCache(String groupName)
+     * @implements AbstractOutputEngine
      *
-     * Implements:
-     *      - <AbstractOutputEngine.clearEdgeGroupCache>
+     * @memberof GenericOutputEngine
      */
     clearEdgeGroupCache:
     function clearEdgeGroupCache(groupName) {
@@ -338,40 +336,34 @@ utils.extend(GenericOutputEngine.prototype, {
         return this;
     },
 
-    iterNodeGroups:
-    /*
-     * Method: iterNodeGroups
+    /**
+     * @fn void iterNodeGroups(Function callback)
+     * @implements AbstractOutputEngine
      *
-     * Extends:
-     *      - <AbstractOutputEngine.iterNodeGroups>
-     *
-     * See also:
-     *      - <iterEdgeGroups>
+     * @memberof GenericOutputEngine
      */
+    iterNodeGroups:
     function iterNodeGroups(callback) {
         var self = this;
         this.nodeGroupIterGuard.run(function() {
             Object.keys(self.nodeGroups).some(function(key) {
-                return callback(self.nodeGroups[key], key);
+                return callback(self.nodeGroups[key], null, self);
             });
         });
     },
 
-    iterEdgeGroups:
-    /*
-     * Method: iterEdgeGroups
+    /**
+     * @fn void iterEdgeGroups(Function callback)
+     * @implements AbstractOutputEngine
      *
-     * Extends:
-     *      - <AbstractOutputEngine.iterEdgeGroups>
-     *
-     * See also:
-     *      - <iterNodeGroups>
+     * @memberof GenericOutputEngine
      */
+    iterEdgeGroups:
     function iterEdgeGroups(callback) {
         var self = this;
         this.edgeGroupIterGuard.run(function() {
             Object.keys(self.edgeGroups).some(function(key) {
-                return callback(self.edgeGroups[key], key);
+                return callback(self.edgeGroups[key], null, self);
             });
         });
     }

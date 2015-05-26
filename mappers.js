@@ -1,9 +1,6 @@
 
-/**
- * @defgroup torusvis_mappers mappers
- * @brief topology mapper specification and implementations
- * @ingroup torusvis
- */
+/** @file */
+
 module.exports = {
     AbstractTopologyMapper:
         require("./mappers/AbstractTopologyMapper"        ),

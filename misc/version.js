@@ -1,47 +1,46 @@
 
-/**
- * @defgroup torusvis_misc_version version
- * @brief torusvis version object
- * @ingroup torusvis_misc
- *
- * @{
- */
+/** @file */
 
 "use strict";
 
-function VersionObject(array) {
-
- *
- * Parameters:
- *     major - (*number*) major version number
- *     minor - (*number*) minor version number
- *     micro - (*number*) micro version number
- *     string - (*String*) version string (as in array.join('.'))
+/**
+ * @struct version
+ * @brief torusvis version object
+ * @details torusvis version object
+ * @note this documentation is for a plain javascript object constant.  It is
+ * documented as a struct with member functions because doxygen cannot handle
+ * plain javascript objects.
+ * @ingroup torusvis_misc
  */
 
-
+function VersionObject(array) {
     /**
-     * @var Number[] array
+     * @var Array<Number> array
      * @brief array of version number components
-     * contains the version number components in the form [major, minor, micro]
+     * @details contains the version number components in the form [major, minor,
+     * micro]
+     * @memberof version
      */
     this.array  = array;
 
     /**
      * @var Number major
      * @brief major version number
+     * @memberof version
      */
     this.major  = array[0];
 
     /**
      * @var Number minor
      * @brief minor version number
+     * @memberof version
      */
     this.minor  = array[1];
 
     /**
      * @var Number micro
      * @brief micro version number
+     * @memberof version
      */
     this.micro  = array[2];
 
@@ -51,11 +50,10 @@ function VersionObject(array) {
      * equivalent to
      *
      *     array.join('.')
+     * @memberof version
      */
     this.string = array.join(".");
 }
-
-/** @} */
 
 VersionObject.prototype.toString = function toString() {
     return this.string;
